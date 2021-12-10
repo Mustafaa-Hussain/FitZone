@@ -9,28 +9,31 @@ import android.widget.EditText;
 
 public class SetServerIP extends AppCompatActivity {
 
-    private String ip;
-    private String port;
+    private EditText ip, port;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_server_ip);
+
+        ip = findViewById(R.id.serverIp);
+        port = findViewById(R.id.serverPort);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("ipAndPort", MODE_PRIVATE);
+        ip.setText(sharedPreferences.getString("ip", null));
+        port.setText(sharedPreferences.getString("port", null));
     }
 
     public void setIpaAndPort(View view) {
-
-        ip = ((EditText)findViewById(R.id.serverIp)).getText().toString();
-        port = ((EditText)findViewById(R.id.serverPort)).getText().toString();
-
         //store ip in shared Preferences
         SharedPreferences sharedPreferences = getSharedPreferences("ipAndPort", MODE_PRIVATE);
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("ip", ip);
-        editor.putString("port", port);
+        editor.putString("ip", ip.getText().toString());
+        editor.putString("port", port.getText().toString());
         editor.commit();
 
         Intent intent = new Intent(SetServerIP.this, LoginActivity.class);
         startActivity(intent);
+        finish();
     }
 }

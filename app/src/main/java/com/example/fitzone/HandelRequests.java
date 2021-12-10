@@ -60,9 +60,14 @@ public class HandelRequests {
         this.serverPort = sharedPreferences.getString("port", serverPort);
     }
 
-    public void signupUser(String name, String email, String pwd) throws JSONException {
+    public interface VolleyResponseListener{
+        void onResponse(boolean status);
+    }
+
+    public void signupUser(String name, String email, String pwd, final VolleyResponseListener volleyResponseListener) {
 
         final int[] statusCode = {0};
+        final boolean[] status = {false};
 
         try {
             String URL = "http://" + serverIP + ':' + serverPort + "/api/register";
@@ -82,9 +87,8 @@ public class HandelRequests {
                             storeAppToken(apiToken);
 
                             Toast.makeText(context, "Registration is Successfully", Toast.LENGTH_SHORT).show();
-
-                            Intent intent = new Intent(context , HomeActivity.class);
-                            context.startActivity(intent);
+                            status[0] = true;
+                            volleyResponseListener.onResponse(status[0]);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -99,6 +103,7 @@ public class HandelRequests {
                     else{
                         Toast.makeText(context, "Something Wrong", Toast.LENGTH_SHORT).show();
                     }
+                    volleyResponseListener.onResponse(status[0]);
                 }
             }) {
                 @Override
@@ -119,9 +124,11 @@ public class HandelRequests {
         }
     }
 
-    public void loginUser(String email, String pwd){
+
+    public void loginUser(String email, String pwd, final VolleyResponseListener volleyResponseListener){
 
         final int[] statusCode = {0};
+        boolean status[] = {false};
 
         try {
             String URL = "http://" + serverIP + ':' + serverPort + "/api/login";
@@ -140,12 +147,12 @@ public class HandelRequests {
                                     storeAppToken(apiToken);
 
                                     Toast.makeText(context, "Login Successfully", Toast.LENGTH_SHORT).show();
-
-                                    Intent intent = new Intent(context , HomeActivity.class);
-                                    context.startActivity(intent);
+                                    status[0] = true;
+                                    volleyResponseListener.onResponse(status[0]);
                                 }
                                 else{
                                     Toast.makeText(context, statusCode[0], Toast.LENGTH_SHORT).show();
+                                    volleyResponseListener.onResponse(status[0]);
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -160,6 +167,7 @@ public class HandelRequests {
                     else{
                         Toast.makeText(context, "Something Wrong", Toast.LENGTH_SHORT).show();
                     }
+                    volleyResponseListener.onResponse(status[0]);
                 }
             }) {
                 @Override

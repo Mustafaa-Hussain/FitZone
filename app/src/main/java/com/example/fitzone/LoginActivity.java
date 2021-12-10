@@ -63,7 +63,16 @@ public class LoginActivity extends AppCompatActivity {
             String emailS = email.getText().toString();
             String passwordS = pwd.getText().toString();
             //send user data to server
-            handelRequests.loginUser(emailS, passwordS);
+            handelRequests.loginUser(emailS, passwordS, new HandelRequests.VolleyResponseListener() {
+                @Override
+                public void onResponse(boolean status) {
+                    if(status){
+                        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+            });
         }
 
     }
@@ -71,5 +80,12 @@ public class LoginActivity extends AppCompatActivity {
     public void goToSignup(View view) {
         Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
         startActivity(intent);
+        finish();
+    }
+
+    public void changeServerIp(View view) {
+        Intent intent = new Intent(LoginActivity.this, SetServerIP.class);
+        startActivity(intent);
+        finish();
     }
 }

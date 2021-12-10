@@ -1,6 +1,7 @@
 package com.example.fitzone;
 
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -67,7 +68,7 @@ public class SignupActivity extends AppCompatActivity {
     }
 
 
-    public void signup(View view) throws JSONException {
+    public void signup(View view) {
         if(verification())
         {
             //for test
@@ -83,11 +84,26 @@ public class SignupActivity extends AppCompatActivity {
             String pwdStr = psw.getText().toString();
 
             //send data to server
-            handelRequests.signupUser(nameStr, emailStr, pwdStr);
+            handelRequests.signupUser(nameStr, emailStr, pwdStr, new HandelRequests.VolleyResponseListener() {
+                @Override
+                public void onResponse(boolean status) {
+                    if(status){
+                        Intent intent = new Intent(SignupActivity.this, HomeActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+            });
         }
         else
         {
             emptyAllFields();
         }
+    }
+
+    public void backToLogin(View view) {
+        Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

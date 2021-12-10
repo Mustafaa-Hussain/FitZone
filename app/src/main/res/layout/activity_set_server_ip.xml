@@ -12,7 +12,6 @@
         android:orientation="vertical" >
 
         <EditText
-            android:text="192.168.1.3"
             android:id="@+id/serverIp"
             android:hint="ip address"
             android:layout_gravity="center"
@@ -20,7 +19,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <EditText
-            android:text="8000"
             android:id="@+id/serverPort"
             android:hint="port no"
             android:gravity="center"
