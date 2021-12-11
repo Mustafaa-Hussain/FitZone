@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/loginHeader"
-            android:text="Welcome Home!"
+            android:text="Welcome Home"
             android:layout_marginTop="@dimen/loginViewsMargin"/>
      </LinearLayout>
 </android.support.constraint.ConstraintLayout>
