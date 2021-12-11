@@ -1,12 +1,13 @@
 package com.example.fitzone;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.Toast;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -14,7 +15,6 @@ public class LoginActivity extends AppCompatActivity {
 
     //private variable
     private EditText email, pwd;
-    private TextView alert;
     private Button loginBt;
     private static final String API_SERVER_URL = "http://172.16.203.192:8000";
 
@@ -25,7 +25,6 @@ public class LoginActivity extends AppCompatActivity {
 
         email = findViewById(R.id.email);
         pwd = findViewById(R.id.password);
-        alert = findViewById(R.id.alert);
         loginBt = findViewById(R.id.loginBT);
 
     }
@@ -34,14 +33,13 @@ public class LoginActivity extends AppCompatActivity {
     //verify each input fields has correct value
     private boolean verification(){
         boolean flag = true;
-        alert.setText("");
 
         if(email.getText().toString().isEmpty()){
-            alert.append(getString(R.string.empty_email));
+            //make change in email field
             flag = false;
         }
         if(pwd.getText().toString().isEmpty()){
-            alert.append(getString(R.string.empty_psw));
+            //make change in password field
             flag = false;
         }
         return flag;
@@ -51,11 +49,9 @@ public class LoginActivity extends AppCompatActivity {
     private void emptyAllFields(){
         email.setText(null);
         pwd.setText(null);
-        alert.setText(null);
     }
 
     public void login(View view) {
-
         if(verification()){
             //HANDiL LOGIN
             HandelRequests handelRequests = new HandelRequests(LoginActivity.this);

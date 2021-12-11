@@ -16,7 +16,6 @@ public class SignupActivity extends AppCompatActivity {
 
     //private variable
     private EditText name, email, psw, vPsw;
-    private TextView alert;
     private Button signupB;
 
     @Override
@@ -24,36 +23,34 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        name = findViewById(R.id.name);
+        name = findViewById(R.id.username);
         email = findViewById(R.id.email);
         psw = findViewById(R.id.password);
         vPsw = findViewById(R.id.vPassword);
-        alert = findViewById(R.id.alert);
     }
 
 
     //verify each input fields has correct value
     private boolean verification(){
         boolean flag = true;
-        alert.setText("");
         if(name.getText().toString().isEmpty()){
-            alert.append(getString(R.string.empty_name));
+            //make change to name field
             flag = false;
         }
         if(email.getText().toString().isEmpty()){
-            alert.append(getString(R.string.empty_email));
+            //make change to email field
             flag = false;
         }
         if(psw.getText().toString().isEmpty()){
-            alert.append(getString(R.string.empty_psw));
+            //make change to pwd field
             flag = false;
         }
         if(vPsw.getText().toString().isEmpty()){
-            alert.append(getString(R.string.empty_vPsw));
+            //make change to vPwd field
             flag = false;
         }
         if(!vPsw.getText().toString().equals(psw.getText().toString())){
-            alert.append(getString(R.string.mismatch_password));
+            //tell user the two passwords are different
             flag = false;
         }
         return flag;
