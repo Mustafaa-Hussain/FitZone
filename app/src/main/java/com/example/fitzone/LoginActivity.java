@@ -1,13 +1,15 @@
 package com.example.fitzone;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.support.v7.app.AppCompatActivity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -16,7 +18,6 @@ public class LoginActivity extends AppCompatActivity {
     //private variable
     private EditText email, pwd;
     private Button loginBt;
-    private static final String API_SERVER_URL = "http://172.16.203.192:8000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,18 +55,42 @@ public class LoginActivity extends AppCompatActivity {
     public void login(View view) {
         if(verification()){
             //HANDiL LOGIN
-            HandelRequests handelRequests = new HandelRequests(LoginActivity.this);
+            HandleRequests handleRequests = new HandleRequests(LoginActivity.this);
 
             String emailS = email.getText().toString();
             String passwordS = pwd.getText().toString();
             //send user data to server
-            handelRequests.loginUser(emailS, passwordS, new HandelRequests.VolleyResponseListener() {
+            handleRequests.loginUser(emailS, passwordS, new HandleRequests.VolleyResponseListener() {
                 @Override
-                public void onResponse(boolean status) {
+                public void onResponse(boolean status, JSONObject jsonObject) {
                     if(status){
-                        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                        startActivity(intent);
-                        finish();
+
+                        HandleRequests handleRequests = new HandleRequests(LoginActivity.this);
+
+                        String apiToken = null;
+                        try {
+                            apiToken = jsonObject.getString("api_token");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        handleRequests.getPosts(apiToken, new HandleRequests.VolleyResponseListener() {
+                            @Override
+                            public void onResponse(boolean status, JSONObject jsonObject) {
+                                Intent intent;
+                                if(status){
+
+                                    SharedPreferences posts = getSharedPreferences("posts", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = posts.edit();
+                                    editor.putString("allPosts", jsonObject.toString());
+                                    editor.commit();
+
+                                    intent = new Intent(LoginActivity.this, HomeActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            }
+                        });
                     }
                 }
             });

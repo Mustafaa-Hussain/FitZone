@@ -2,14 +2,15 @@ package com.example.fitzone;
 
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -74,20 +75,44 @@ public class SignupActivity extends AppCompatActivity {
             //end for test
 
             //String url = API_SERVER_URL + "/api/register?username=" + name + "&email=" + email +"&password=" + psw;
-            HandelRequests handelRequests = new HandelRequests(SignupActivity.this);
+            HandleRequests handleRequests = new HandleRequests(SignupActivity.this);
 
             String nameStr = name.getText().toString();
             String emailStr = email.getText().toString();
             String pwdStr = psw.getText().toString();
 
             //send data to server
-            handelRequests.signupUser(nameStr, emailStr, pwdStr, new HandelRequests.VolleyResponseListener() {
+            handleRequests.signupUser(nameStr, emailStr, pwdStr, new HandleRequests.VolleyResponseListener() {
                 @Override
-                public void onResponse(boolean status) {
+                public void onResponse(boolean status, JSONObject jsonObject) {
                     if(status){
-                        Intent intent = new Intent(SignupActivity.this, HomeActivity.class);
-                        startActivity(intent);
-                        finish();
+
+                        HandleRequests handleRequests = new HandleRequests(SignupActivity.this);
+
+                        String apiToken = null;
+                        try {
+                            apiToken = jsonObject.getString("api_token");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        handleRequests.getPosts(apiToken, new HandleRequests.VolleyResponseListener() {
+                            @Override
+                            public void onResponse(boolean status, JSONObject jsonObject) {
+                                Intent intent;
+                                if(status){
+
+                                    SharedPreferences posts = getSharedPreferences("posts", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = posts.edit();
+                                    editor.putString("allPosts", jsonObject.toString());
+                                    editor.commit();
+
+                                    intent = new Intent(SignupActivity.this, HomeActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            }
+                        });
                     }
                 }
             });

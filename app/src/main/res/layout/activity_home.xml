@@ -6,28 +6,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".LoginActivity"
-    android:background="@drawable/login_bk"
+    android:background="@drawable/home_bg"
     android:focusableInTouchMode="true">
 
-    <LinearLayout android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        xmlns:android="http://schemas.android.com/apk/res/android">
-        <TextView
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/loginHeader"
-            android:text="Welcome Home"
-            android:layout_marginTop="@dimen/loginViewsMargin"/>
-     </LinearLayout>
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="45dp"
+        android:layout_marginBottom="30dp">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycleView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </RelativeLayout>
+
 </android.support.constraint.ConstraintLayout>
