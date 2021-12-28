@@ -11,11 +11,12 @@
         android:roundIcon="@mipmap/ic_logo_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
+        <activity
+            android:name=".Comments"
+            android:exported="false" />
         <activity
             android:name=".HomeActivity"
-            android:exported="false" />
-        <!-- android:usesCleartextTraffic="true" -->
+            android:exported="false" /> <!-- android:usesCleartextTraffic="true" -->
         <activity
             android:name=".SetServerIP"
             android:exported="false" />

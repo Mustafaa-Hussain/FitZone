@@ -149,6 +149,7 @@ public class HandleRequests {
                             try {
                                 if(statusCode[0] == 201) {
                                     String apiToken = response.getString("api_token");
+
                                     //store api token in sharedPreferences
                                     storeAppToken(apiToken);
 
@@ -198,7 +199,7 @@ public class HandleRequests {
 
         final int[] statusCode = { 0 };
         boolean status[] = { false };
-        final JSONObject[] posts = {null};
+        final JSONObject[] posts = { null };
 
         String URL = "http://" + serverIP + ':' + serverPort + "/api/posts/";
 
@@ -216,12 +217,12 @@ public class HandleRequests {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-//                if(statusCode[0] == 403){
-//                    Toast.makeText(context, "You Are Not logged in", Toast.LENGTH_SHORT).show();
-//                }
-//                else{
-//                    Toast.makeText(context, "Check Your Internet Connection!...", Toast.LENGTH_SHORT).show();
-//                }
+                if(statusCode[0] == 403){
+                    Toast.makeText(context, "You Are Not logged in", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(context, "Check Your Internet Connection!...", Toast.LENGTH_SHORT).show();
+                }
                 Toast.makeText(context, "You Are Not logged in", Toast.LENGTH_SHORT).show();
                 volleyResponseListener.onResponse(status[0], null);
             }
@@ -243,7 +244,7 @@ public class HandleRequests {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headerMap = new HashMap<String, String>();
                 headerMap.put("Content-Type", "application/json");
-                headerMap.put("Authorization", "Bearer " + apiTokenFile.getString("apiToken", null));
+                headerMap.put("Authorization", "Bearer " + apiToken);
                 return headerMap;
             }
         };
@@ -293,7 +294,7 @@ public class HandleRequests {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headerMap = new HashMap<String, String>();
                 headerMap.put("Content-Type", "application/json");
-                headerMap.put("Authorization", "Bearer " + apiTokenFile.getString("apiToken", null));
+                headerMap.put("Authorization", "Bearer " + apiToken);
                 return headerMap;
             }
         };
@@ -343,7 +344,7 @@ public class HandleRequests {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headerMap = new HashMap<String, String>();
                 headerMap.put("Content-Type", "application/json");
-                headerMap.put("Authorization", "Bearer " + apiTokenFile.getString("apiToken", null));
+                headerMap.put("Authorization", "Bearer " + apiToken);
                 return headerMap;
             }
         };

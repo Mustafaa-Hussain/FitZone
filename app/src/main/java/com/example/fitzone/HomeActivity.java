@@ -1,5 +1,6 @@
 package com.example.fitzone;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -8,30 +9,29 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class HomeActivity extends AppCompatActivity implements MyRecyclerViewAdapter.ItemClickListener{
-    MyRecyclerViewAdapter adapter;
+public class HomeActivity extends AppCompatActivity implements RecycleViewAdapterForPosts.ItemClickListener{
+    RecycleViewAdapterForPosts adapter;
     RecyclerView recyclerView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+
         //posts
         JSONObject postsArray;
         SharedPreferences postsT = getSharedPreferences("posts", MODE_PRIVATE);
+
         try {
             postsArray = new JSONObject(postsT.getString("allPosts", null));
 
             recyclerView = findViewById(R.id.recycleView);
             recyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this));
-
-            adapter = new MyRecyclerViewAdapter(HomeActivity.this, postsArray.getJSONArray("post"));
+            adapter = new RecycleViewAdapterForPosts(HomeActivity.this, postsArray.getJSONArray("posts"));
             adapter.setClickListener(this);
             recyclerView.setAdapter(adapter);
         } catch (JSONException e) {
@@ -69,7 +69,11 @@ public class HomeActivity extends AppCompatActivity implements MyRecyclerViewAda
             }
             else if(view.getId() == R.id.comment){
                 //handle comment
-                Toast.makeText(HomeActivity.this, "View Comments of post id: " + adapter.getItem(position).getString("id"), Toast.LENGTH_SHORT).show();
+                Intent intent;
+                intent = new Intent(HomeActivity.this, Comments.class);
+                intent.putExtra("post_id", adapter.getItem(position).getString("comments"));
+                startActivity(intent);
+                //finish();
             }
 
 

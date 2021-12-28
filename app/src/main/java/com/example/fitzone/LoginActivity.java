@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -77,14 +78,12 @@ public class LoginActivity extends AppCompatActivity {
                         handleRequests.getPosts(apiToken, new HandleRequests.VolleyResponseListener() {
                             @Override
                             public void onResponse(boolean status, JSONObject jsonObject) {
-                                Intent intent;
                                 if(status){
-
+                                    Intent intent;
                                     SharedPreferences posts = getSharedPreferences("posts", MODE_PRIVATE);
                                     SharedPreferences.Editor editor = posts.edit();
                                     editor.putString("allPosts", jsonObject.toString());
                                     editor.commit();
-
                                     intent = new Intent(LoginActivity.this, HomeActivity.class);
                                     startActivity(intent);
                                     finish();

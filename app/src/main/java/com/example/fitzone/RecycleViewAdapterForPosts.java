@@ -13,7 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
+public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecycleViewAdapterForPosts.ViewHolder> {
 
     private JSONArray mData;
     private LayoutInflater mInflater;
@@ -22,7 +22,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     Context context;
 
     // data is passed into the constructor
-    MyRecyclerViewAdapter(Context context, JSONArray arrayOfPosts) {
+    RecycleViewAdapterForPosts(Context context, JSONArray arrayOfPosts) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = arrayOfPosts;
         this.context = context;
@@ -45,6 +45,8 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             holder.initDate.setText(post.getString("created_at").substring(0, post.getString("created_at").indexOf('T')));
             holder.caption.setText(post.getString("caption"));
             holder.content.setText(post.getString("content"));
+
+
             holder.noOfLikes.setText(post.getString("number_of_likes"));
             holder.noOfComments.setText(post.getString("number_of_comments"));
 

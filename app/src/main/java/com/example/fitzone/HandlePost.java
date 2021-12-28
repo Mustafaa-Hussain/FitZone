@@ -65,7 +65,7 @@ public class HandlePost {
         try {
             JSONObject jsonObject = new JSONObject(postsFile.getString("allPosts", null));
 
-            JSONArray postsArray = jsonObject.getJSONArray("post");
+            JSONArray postsArray = jsonObject.getJSONArray("posts");
 
             if(getStatus(postID, postsArray).equals("true")){
                 handleRequests.setDislike(apiToken, postID, new HandleRequests.VolleyResponseListener() {
