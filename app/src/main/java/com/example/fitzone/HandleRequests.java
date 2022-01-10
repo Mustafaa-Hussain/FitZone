@@ -5,6 +5,7 @@ import static android.content.Context.MODE_PRIVATE;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -13,6 +14,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -154,6 +156,7 @@ public class HandleRequests {
                                     storeAppToken(apiToken);
 
                                     Toast.makeText(context, "Login Successfully", Toast.LENGTH_SHORT).show();
+
                                     status[0] = true;
                                     volleyResponseListener.onResponse(status[0], response);
                                 }
@@ -223,7 +226,6 @@ public class HandleRequests {
                 else{
                     Toast.makeText(context, "Check Your Internet Connection!...", Toast.LENGTH_SHORT).show();
                 }
-                Toast.makeText(context, "You Are Not logged in", Toast.LENGTH_SHORT).show();
                 volleyResponseListener.onResponse(status[0], null);
             }
         }) {
@@ -251,6 +253,61 @@ public class HandleRequests {
 
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
+
+    public void addPost(String caption, String content, final VolleyResponseListener volleyResponseListener){
+
+        final int[] statusCode = { 0 };
+        boolean status[] = { false };
+
+        try {
+            String URL = "http://" + serverIP + ':' + serverPort + "/api/posts";
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("caption",caption);
+            jsonBody.put("content",content);
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, jsonBody,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            if(statusCode[0] == 201) {
+
+                                volleyResponseListener.onResponse(status[0], response);
+                            }
+                            else{
+                                Toast.makeText(context, "failed " + statusCode[0], Toast.LENGTH_SHORT).show();
+                                volleyResponseListener.onResponse(status[0], null);
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    if(statusCode[0] == 200){
+                        Toast.makeText(context, "something wrong", Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        Toast.makeText(context, "Check Your Internet Connection!...", Toast.LENGTH_SHORT).show();
+                    }
+                    volleyResponseListener.onResponse(status[0], null);
+                }
+            }) {
+                @Override
+                public String getBodyContentType() {
+                    return "application/json; charset=utf-8";
+                }
+
+                @Override
+                protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
+                    statusCode[0] =response.statusCode;
+                    return super.parseNetworkResponse(response);
+                }
+            };
+
+            MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     public void setLike(String apiToken, String postID,final VolleyResponseListener volleyResponseListener){

@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".Training"
+            android:exported="false" />
+        <activity
+            android:name=".Profile"
+            android:exported="false" />
+        <activity
             android:name=".Comments"
             android:exported="false" />
         <activity
@@ -19,6 +25,9 @@
             android:exported="false" /> <!-- android:usesCleartextTraffic="true" -->
         <activity
             android:name=".SetServerIP"
+            android:exported="false" />
+        <activity
+            android:name=".HandelCommon"
             android:exported="false" />
         <activity
             android:name=".LoginActivity"

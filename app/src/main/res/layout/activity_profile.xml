@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Comments"
+    tools:context=".Profile"
     android:background="@drawable/home_bg"
     android:focusableInTouchMode="true">
 
@@ -15,33 +15,25 @@
         android:layout_marginTop="40dp"
         android:orientation="vertical">
 
-        <RelativeLayout
-            android:id="@+id/relativeLayout"
+        <LinearLayout
+            android:id="@+id/profileContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:layout_weight="20">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycleView"
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/add_comment_fab"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/recycleView"
-                android:layout_alignParentEnd="true"
-                android:layout_gravity="bottom|end"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="7dp"
-                android:background="@drawable/like_button"
-                app:fabSize="normal"
-                app:srcCompat="@drawable/add_post"
-                app:tint="@color/white" />
-        </RelativeLayout>
+                android:gravity="center"
+                android:textSize="50dp"
+                android:textColor="@color/white"
+                android:layout_margin="50dp"
+                android:text="profile page"/>
+        </LinearLayout>
 
         <include
+            android:id="@+id/navigationBar"
             layout="@layout/nav_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
