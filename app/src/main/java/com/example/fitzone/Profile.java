@@ -258,7 +258,6 @@ public class Profile extends HandelCommon implements RecycleViewAdapterForPosts.
                 //put the message
                 ((TextView)popupView.findViewById(R.id.messageQ)).setText("You want to remove this post?");
 
-
                 // show the popup window
                 // which view you pass in doesn't matter, it is only used for the window token
                 askPopup.showAtLocation(view, Gravity.CENTER, 0, 0);

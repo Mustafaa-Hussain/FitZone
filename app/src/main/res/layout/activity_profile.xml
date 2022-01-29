@@ -84,7 +84,7 @@
                 android:text="My Posts"/>
 
             <RelativeLayout
-                android:id="@+id/relativeLayout"
+                android:id="@+id/relativeLayoutOfPrograms"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 

@@ -45,7 +45,7 @@ public class Comments extends HandelCommon {
         intent = getIntent();
         int postID = Integer.parseInt(intent.getStringExtra("post_id"));
 
-        addComment = findViewById(R.id.search_for_new_friend);
+        addComment = findViewById(R.id.add_comment);
         addComment.setOnClickListener(new View.OnClickListener() {
 
             @Override

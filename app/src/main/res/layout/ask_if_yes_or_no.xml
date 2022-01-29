@@ -25,6 +25,7 @@
             android:textSize="20dp" />
 
         <LinearLayout
+            android:id="@+id/yes_no_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">

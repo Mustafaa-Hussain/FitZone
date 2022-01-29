@@ -1,8 +1,6 @@
 package com.example.fitzone;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,7 +14,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -182,8 +179,42 @@ public class HomeActivity extends HandelCommon implements RecycleViewAdapterForP
                 startActivity(intent);
                 //finish();
             }
+            else if(view.getId() == R.id.more){
+                PopupWindow askPopup;
+
+                // inflate the layout of the popup window
+                LayoutInflater inflater = (LayoutInflater)
+
+                        getSystemService(LAYOUT_INFLATER_SERVICE);
+                View popupView = inflater.inflate(R.layout.ask_if_yes_or_no, null);
+
+                // create the popup window
+                int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+                int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+                boolean focusable = true; // lets taps outside the popup also dismiss it
+                askPopup = new PopupWindow(popupView, width, height, true);
 
 
+                //put the message
+                ((TextView)popupView.findViewById(R.id.messageQ)).setText("Info about publisher...");
+
+
+                // show the popup window
+                // which view you pass in doesn't matter, it is only used for the window token
+                askPopup.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+                ((LinearLayout)popupView.findViewById(R.id.yes_no_buttons)).setVisibility(View.INVISIBLE);
+                //get info about user that post this post
+
+                // dismiss the popup window when touched
+                popupView.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        askPopup.dismiss();
+                        return true;
+                    }
+                });
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
