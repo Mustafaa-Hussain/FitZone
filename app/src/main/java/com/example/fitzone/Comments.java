@@ -1,6 +1,7 @@
 package com.example.fitzone;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -10,15 +11,16 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Comments extends HandelCommon {
 
@@ -26,6 +28,8 @@ public class Comments extends HandelCommon {
     RecyclerView recyclerView;
 
     FloatingActionButton addComment;
+
+    Intent intent;
 
     Button share, cancel;
     PopupWindow popupWindow;
@@ -35,7 +39,13 @@ public class Comments extends HandelCommon {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments);
 
-        addComment = findViewById(R.id.add_comment_fab);
+        SharedPreferences apiTokenFile = getSharedPreferences("UserData", Comments.MODE_PRIVATE);
+        String apiToken = apiTokenFile.getString("apiToken", null);
+
+        intent = getIntent();
+        int postID = Integer.parseInt(intent.getStringExtra("post_id"));
+
+        addComment = findViewById(R.id.search_for_new_friend);
         addComment.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -62,18 +72,49 @@ public class Comments extends HandelCommon {
                 share.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Snackbar.make(view, "share comment", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
 
-                        popupWindow.dismiss();
+                        EditText content;
+                        content = popupView.findViewById(R.id.commentContent);
+
+                        if(!content.getText().equals("")){
+
+                            String apiToken = getSharedPreferences("UserData", MODE_PRIVATE).getString("apiToken", null);
+
+                            HandleRequests handleRequests = new HandleRequests(Comments.this);
+                            handleRequests.addComment(content.getText().toString(), postID, apiToken,
+                                    new HandleRequests.VolleyResponseListener() {
+                                        @Override
+                                        public void onResponse(boolean status, JSONObject jsonObject) {
+                                            if (status) {
+                                                Snackbar.make(view, "post shared successfully", Snackbar.LENGTH_LONG)
+                                                        .setAction("Action", null).show();
+
+                                                intent = new Intent(Comments.this, Comments.class);
+                                                intent.putExtra("post_id", String.valueOf(postID));
+                                                startActivity(intent);
+
+                                                popupWindow.dismiss();
+                                            }
+                                            else {
+                                                Snackbar.make(view, "something wrong with your internet connection", Snackbar.LENGTH_LONG)
+                                                        .setAction("Action", null).show();
+                                            }
+                                        }
+                                    });
+                        }
+                        else{
+                            Snackbar.make(view, "must fill all fields", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                        }
+
                     }
                 });
 
-                cancel = popupView.findViewById(R.id.cancelPopUp);
+                cancel = popupView.findViewById(R.id.cancelPopUpCommentWindow);
                 cancel.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Snackbar.make(view, "cancel comment", Snackbar.LENGTH_LONG)
+                        Snackbar.make(view, "cancel post", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
 
                         popupWindow.dismiss();
@@ -82,6 +123,7 @@ public class Comments extends HandelCommon {
 
                 // dismiss the popup window when touched
                 popupView.setOnTouchListener(new View.OnTouchListener() {
+
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
                         popupWindow.dismiss();
@@ -90,25 +132,31 @@ public class Comments extends HandelCommon {
                 });
             }});
 
+        HandleRequests handleRequests = new HandleRequests(Comments.this);
+        handleRequests.getPost(apiToken, postID, new HandleRequests.VolleyResponseListener() {
+            @Override
+            public void onResponse(boolean status, JSONObject jsonObject) {
 
-        Intent intent = getIntent();
+                if(status){
+                    recyclerView = findViewById(R.id.recycleView);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(Comments.this));
 
-        try {
-            JSONArray arrayOfComments = new JSONArray(intent.getStringExtra("post_id"));
+                    try {
+                        JSONArray myComments = jsonObject.getJSONArray("comments");
 
-            if(!intent.getStringExtra("post_id").equals("[]")){
-                recyclerView = findViewById(R.id.recycleView);
-                recyclerView.setLayoutManager(new LinearLayoutManager(Comments.this));
-                adapter = new RecycleViewAdapterForComments(Comments.this, arrayOfComments);
-                recyclerView.setAdapter(adapter);
+                        if(!myComments.toString().equals("[]")) {
+                            adapter = new RecycleViewAdapterForComments(Comments.this, myComments);
+                        }
+                        else {
+                            Snackbar.make(findViewById(R.id.recycleView), "this post doesn't have comments", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    recyclerView.setAdapter(adapter);
+                }
             }
-            else{
-                Toast.makeText(Comments.this, "This Post Dos not Contain Comments...", Toast.LENGTH_LONG).show();
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-
+        });
     }
 }

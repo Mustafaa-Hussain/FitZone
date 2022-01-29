@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".FriendsPage"
+            android:exported="false" />
+        <activity
+            android:name=".Reconnect"
+            android:exported="false" />
+        <activity
             android:name=".Training"
             android:exported="false" />
         <activity
@@ -22,7 +28,7 @@
             android:exported="false" />
         <activity
             android:name=".HomeActivity"
-            android:exported="false" /> <!-- android:usesCleartextTraffic="true" -->
+            android:exported="false" />
         <activity
             android:name=".SetServerIP"
             android:exported="false" />

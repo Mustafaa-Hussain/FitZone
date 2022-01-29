@@ -81,7 +81,7 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecycleView
 
         ImageView userAvatar;
 
-        Button comment, like;
+        Button comment, like, more;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -94,9 +94,12 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecycleView
             //profileImage = itemView.findViewById(R.id.userAvatar);
             like = itemView.findViewById(R.id.like);
             comment = itemView.findViewById(R.id.comment);
+            more = itemView.findViewById(R.id.more);
 
             like.setOnClickListener(this);
             comment.setOnClickListener(this);
+            more.setOnClickListener(this);
+
 
         }
 

@@ -25,30 +25,32 @@ public class MainActivity extends AppCompatActivity {
 
 
         SharedPreferences apiTokenFile = getSharedPreferences("UserData", MODE_PRIVATE);
-        String apiToken = apiTokenFile.getString("apiToken", null);
+        String apiToken = apiTokenFile.getString("apiToken", "");
 
-        HandleRequests handleRequests = new HandleRequests(MainActivity.this);
-
-        handleRequests.getPosts(apiToken, new HandleRequests.VolleyResponseListener() {
-            @Override
-            public void onResponse(boolean status, JSONObject jsonObject) {
-                Intent intent;
-                if(status){
-
-                    SharedPreferences posts = getSharedPreferences("posts", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = posts.edit();
-                    editor.putString("allPosts", jsonObject.toString());
-                    editor.commit();
-
-                    intent = new Intent(MainActivity.this, HomeActivity.class);
+        if(apiToken.equals("")){
+            Intent intent;
+            intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        else{
+            HandleRequests handleRequests = new HandleRequests(MainActivity.this);
+            handleRequests.getUserProfile(apiToken, new HandleRequests.VolleyResponseListener() {
+                @Override
+                public void onResponse(boolean status, JSONObject jsonObject) {
+                    Intent localIntent;
+                    if(status){
+                        localIntent = new Intent(MainActivity.this, HomeActivity.class);
+                    }
+                    else{
+                        localIntent = new Intent(MainActivity.this, Reconnect.class);
+                    }
+                    startActivity(localIntent);
+                    finish();
                 }
-                else{
-                    intent = new Intent(MainActivity.this, LoginActivity.class);
-                }
-                startActivity(intent);
-                finish();
-            }
-        });
+            });
+        }
+
 
 //        final Handler handler = new Handler();
 //        handler.postDelayed(new Runnable() {

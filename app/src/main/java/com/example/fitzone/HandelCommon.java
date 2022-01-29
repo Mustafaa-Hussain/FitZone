@@ -25,17 +25,4 @@ public class HandelCommon extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
-
-    public void sharePost(View view){
-        Intent intent;
-        intent = new Intent(this, HomeActivity.class);
-        startActivity(intent);
-        finish();
-    }
-    public void cancelPopUp(View view){
-        Intent intent;
-        intent = new Intent(this, HomeActivity.class);
-        startActivity(intent);
-        finish();
-    }
 }

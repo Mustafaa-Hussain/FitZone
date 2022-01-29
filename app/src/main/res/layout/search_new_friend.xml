@@ -6,10 +6,10 @@
     android:background="@drawable/like_button">
 
     <LinearLayout
-    android:layout_margin="15dp"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+        android:layout_margin="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
@@ -18,7 +18,7 @@
             android:textSize="28dp"
             android:layout_marginTop="15dp"
             android:textColor="@color/black"
-            android:text="New Post"/>
+            android:text="Find new friend..."/>
 
 
         <com.google.android.material.textfield.TextInputLayout
@@ -26,31 +26,21 @@
             style="@style/parent">
 
             <EditText
-                android:id="@+id/caption"
+                android:id="@+id/searchUsername"
                 style="@style/modifiedEditText"
-                android:text=""
-                android:hint="Caption"
+                android:hint="username"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/parent">
-
-            <EditText
-                android:id="@+id/content"
-                android:text=""
-                style="@style/modifiedEditText"
-                android:hint="Content"/>
-        </com.google.android.material.textfield.TextInputLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <Button
-                android:id="@+id/sharePost"
+                android:id="@+id/search"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="share"
+                android:text="search"
                 android:layout_margin="10dp"
                 android:layout_weight="3"
                 android:background="@drawable/like_button"/>

@@ -38,6 +38,8 @@ public class HomeActivity extends HandelCommon implements RecycleViewAdapterForP
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        String apiToken = getSharedPreferences("UserData", MODE_PRIVATE).getString("apiToken", null);
+
         addPost = findViewById(R.id.add_post_fab);
         addPost.setOnClickListener(new View.OnClickListener() {
 
@@ -65,10 +67,40 @@ public class HomeActivity extends HandelCommon implements RecycleViewAdapterForP
                         share.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Snackbar.make(view, "share post", Snackbar.LENGTH_LONG)
-                                        .setAction("Action", null).show();
 
-                                popupWindow.dismiss();
+                                TextView caption, content;
+                                caption = popupView.findViewById(R.id.caption);
+                                content = popupView.findViewById(R.id.content);
+
+                                if(!caption.getText().equals("") && !content.getText().equals("")){
+
+                                    HandleRequests handleRequests = new HandleRequests(HomeActivity.this);
+                                    handleRequests.addPost(caption.getText().toString(), content.getText().toString(), apiToken,
+                                            new HandleRequests.VolleyResponseListener() {
+                                                @Override
+                                                public void onResponse(boolean status, JSONObject jsonObject) {
+                                                    if (status) {
+                                                        Snackbar.make(view, "post shared successfully", Snackbar.LENGTH_LONG)
+                                                                .setAction("Action", null).show();
+
+                                                        Intent intent;
+                                                        intent = new Intent(HomeActivity.this, HomeActivity.class);
+                                                        startActivity(intent);
+
+                                                        popupWindow.dismiss();
+                                                    }
+                                                    else {
+                                                        Snackbar.make(view, "something wrong with your internet connection", Snackbar.LENGTH_LONG)
+                                                                .setAction("Action", null).show();
+                                                    }
+                                                }
+                                            });
+                                }
+                                else{
+                                    Snackbar.make(view, "must fill all fields", Snackbar.LENGTH_LONG)
+                                            .setAction("Action", null).show();
+                                }
+
                             }
                         });
 
@@ -94,21 +126,24 @@ public class HomeActivity extends HandelCommon implements RecycleViewAdapterForP
                         });
                     }});
 
-        //posts
-        JSONObject postsArray;
-        SharedPreferences postsT = getSharedPreferences("posts", MODE_PRIVATE);
-
-        try {
-            postsArray = new JSONObject(postsT.getString("allPosts", null));
-
-            recyclerView = findViewById(R.id.recycleView);
-            recyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this));
-            adapter = new RecycleViewAdapterForPosts(HomeActivity.this, postsArray.getJSONArray("posts"));
-            adapter.setClickListener(this);
-            recyclerView.setAdapter(adapter);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        //request and display posts
+        HandleRequests handleRequests = new HandleRequests(HomeActivity.this);
+        handleRequests.getPosts(apiToken, new HandleRequests.VolleyResponseListener() {
+            @Override
+            public void onResponse(boolean status, JSONObject jsonObject) {
+                if(status){
+                    recyclerView = findViewById(R.id.recycleView);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this));
+                    try {
+                        adapter = new RecycleViewAdapterForPosts(HomeActivity.this, jsonObject.getJSONArray("posts"));
+                        adapter.setClickListener(HomeActivity.this);
+                        recyclerView.setAdapter(adapter);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -143,7 +178,7 @@ public class HomeActivity extends HandelCommon implements RecycleViewAdapterForP
                 //handle comment
                 Intent intent;
                 intent = new Intent(HomeActivity.this, Comments.class);
-                intent.putExtra("post_id", adapter.getItem(position).getString("comments"));
+                intent.putExtra("post_id", adapter.getItem(position).getString("id"));
                 startActivity(intent);
                 //finish();
             }

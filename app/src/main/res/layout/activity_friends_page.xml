@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Comments"
+    tools:context=".FriendsPage"
     android:background="@drawable/home_bg"
     android:focusableInTouchMode="true">
 
@@ -14,7 +14,6 @@
         android:layout_height="match_parent"
         android:layout_marginTop="40dp"
         android:orientation="vertical">
-
         <RelativeLayout
             android:id="@+id/relativeLayout"
             android:layout_width="match_parent"
@@ -37,8 +36,7 @@
                 android:layout_marginBottom="7dp"
                 android:background="@drawable/like_button"
                 app:fabSize="normal"
-                app:srcCompat="@drawable/add_post"
-                app:tint="@color/white" />
+                app:srcCompat="@drawable/search_for_new"/>
         </RelativeLayout>
 
         <include
