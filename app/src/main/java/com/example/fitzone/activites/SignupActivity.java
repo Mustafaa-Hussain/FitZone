@@ -98,23 +98,9 @@ public class SignupActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
 
-                        handleRequests.getPosts(apiToken, new HandleRequests.VolleyResponseListener() {
-                            @Override
-                            public void onResponse(boolean status, JSONObject jsonObject) {
-                                Intent intent;
-                                if(status){
-
-                                    SharedPreferences posts = getSharedPreferences("posts", MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = posts.edit();
-                                    editor.putString("allPosts", jsonObject.toString());
-                                    editor.commit();
-
-                                    intent = new Intent(SignupActivity.this, HomeActivity.class);
-                                    startActivity(intent);
-                                    finish();
-                                }
-                            }
-                        });
+                        Intent intent = new Intent(SignupActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
                     }
                 }
             });

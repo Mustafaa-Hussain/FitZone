@@ -86,13 +86,13 @@ public class TimerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Button b = (Button) v;
-                if (b.getText().equals("resit")) {
+                if (b.getText().equals("reset")) {
                     timerHandler.removeCallbacks(timerRunnable);
                     b.setText("start");
                 } else {
                     startTime = System.currentTimeMillis();
                     timerHandler.postDelayed(timerRunnable, 0);
-                    b.setText("resit");
+                    b.setText("reset");
                 }
             }
         });
