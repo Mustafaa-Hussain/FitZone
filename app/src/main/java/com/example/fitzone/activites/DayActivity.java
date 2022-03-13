@@ -90,7 +90,7 @@ public class DayActivity extends HandelCommon implements RecycleViewAdapterForPr
             View popupView = inflater.inflate(R.layout.begining_trining_structure, null);
 
             // create the popup window
-            int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+            int width = LinearLayout.LayoutParams.MATCH_PARENT;
             int height = LinearLayout.LayoutParams.WRAP_CONTENT;
             boolean focusable = true; // lets taps outside the popup also dismiss it
             startTraining = new PopupWindow(popupView, width, height, true);
@@ -150,6 +150,7 @@ public class DayActivity extends HandelCommon implements RecycleViewAdapterForPr
                             Toast.makeText(DayActivity.this, "beginning " + object.getString("TName"), Toast.LENGTH_SHORT).show();
                             intent = new Intent(DayActivity.this, TimerActivity.class);
                             intent.putExtra("TName", object.getString("TName"));
+                            intent.putExtra("TNo", object.getString("TReps") + " X " + object.getString("TSets"));
                             startActivity(intent);
                         } catch (JSONException e) {
                             e.printStackTrace();

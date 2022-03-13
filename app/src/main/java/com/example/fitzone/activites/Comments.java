@@ -63,7 +63,7 @@ public class Comments extends HandelCommon {
                 View popupView = inflater.inflate(R.layout.add_comment, null);
 
                 // create the popup window
-                int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+                int width = LinearLayout.LayoutParams.MATCH_PARENT;
                 int height = LinearLayout.LayoutParams.WRAP_CONTENT;
                 boolean focusable = true; // lets taps outside the popup also dismiss it
                 popupWindow = new PopupWindow(popupView, width, height, true);

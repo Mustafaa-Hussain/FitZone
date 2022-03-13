@@ -23,11 +23,10 @@
         app:layout_constraintTop_toTopOf="parent"
         xmlns:android="http://schemas.android.com/apk/res/android">
         <TextView
-            android:layout_gravity="left"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/loginHeader"
-            android:text="Server ip and port"
+            android:text="@string/server_ip_and_port"
             android:layout_marginTop="@dimen/loginViewsMargin"/>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -39,7 +38,7 @@
                 android:gravity="center"
                 android:id="@+id/serverIp"
                 style="@style/modifiedEditText"
-                android:hint="Ip"
+                android:hint="@string/ip"
                 android:inputType="text"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -53,16 +52,17 @@
                 android:gravity="center"
                 android:id="@+id/serverPort"
                 style="@style/modifiedEditText"
-                android:hint="port"
+                android:hint="@string/port"
                 android:inputType="text"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
             style="@style/loginButton"
-            android:text="Change Server Data"
+            android:text="@string/setIpaAndPort"
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/loginViewsMargin"
-            android:onClick="setIpaAndPort" />
+            android:onClick="setIpaAndPort"
+            android:textAllCaps="false" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

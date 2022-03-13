@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/like_button">
 
@@ -15,10 +15,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="28dp"
-            android:layout_marginTop="15dp"
             android:textColor="@color/black"
-            android:text="New Post"/>
+            android:text="@string/new_post"/>
 
 
         <com.google.android.material.textfield.TextInputLayout
@@ -27,9 +25,10 @@
 
             <EditText
                 android:id="@+id/caption"
-                style="@style/modifiedEditText"
-                android:text=""
-                android:hint="Caption"
+                android:layout_gravity="start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/post_title"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -38,9 +37,10 @@
 
             <EditText
                 android:id="@+id/content"
-                android:text=""
-                style="@style/modifiedEditText"
-                android:hint="Content"/>
+                android:layout_gravity="start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/content"/>
         </com.google.android.material.textfield.TextInputLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -50,20 +50,22 @@
                 android:id="@+id/sharePost"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="share"
+                android:text="@string/share"
                 android:layout_margin="10dp"
                 android:layout_weight="3"
-                android:background="@drawable/like_button"/>
+                android:background="@drawable/like_button"
+                android:textAllCaps="false"/>
             <Button
                 android:id="@+id/cancelPopUp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="cancel"
+                android:text="@string/cancel"
                 android:layout_margin="10dp"
                 android:layout_weight="1"
-                android:background="@drawable/button"/>
+                android:background="@drawable/button"
+                android:textAllCaps="false"/>
         </LinearLayout>
     </LinearLayout>
 
 
-</RelativeLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

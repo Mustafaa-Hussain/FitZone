@@ -1,4 +1,4 @@
-package com.example.fitzone.recycleViewAdapters;
+package com.example.fitzone.handelers;
 
 import android.content.Context;
 

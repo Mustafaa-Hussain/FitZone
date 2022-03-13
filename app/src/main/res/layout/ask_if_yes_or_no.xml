@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/button">
 
@@ -20,9 +20,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="15dp"
-            android:text="Message Q?..."
-            android:textColor="@color/black"
-            android:textSize="20dp" />
+            android:text="@string/message_q"
+            android:textColor="@color/black" />
 
         <LinearLayout
             android:id="@+id/yes_no_buttons"
@@ -37,7 +36,8 @@
                 android:layout_margin="10dp"
                 android:layout_weight="3"
                 android:background="@drawable/like_button"
-                android:text="yes" />
+                android:text="@string/yes"
+                android:textAllCaps="false" />
 
             <Button
                 android:id="@+id/no"
@@ -46,9 +46,10 @@
                 android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/button"
-                android:text="no" />
+                android:text="@string/no"
+                android:textAllCaps="false" />
         </LinearLayout>
     </LinearLayout>
 
 
-</RelativeLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

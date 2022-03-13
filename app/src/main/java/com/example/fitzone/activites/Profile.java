@@ -132,7 +132,7 @@ public class Profile extends HandelCommon implements RecycleViewAdapterForPosts.
                 View popupView = inflater.inflate(R.layout.add_post, null);
 
                 // create the popup window
-                int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+                int width = LinearLayout.LayoutParams.MATCH_PARENT;
                 int height = LinearLayout.LayoutParams.WRAP_CONTENT;
                 boolean focusable = true; // lets taps outside the popup also dismiss it
                 popupWindow = new PopupWindow(popupView, width, height, true);
@@ -255,7 +255,7 @@ public class Profile extends HandelCommon implements RecycleViewAdapterForPosts.
                 View popupView = inflater.inflate(R.layout.ask_if_yes_or_no, null);
 
                 // create the popup window
-                int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+                int width = LinearLayout.LayoutParams.MATCH_PARENT;
                 int height = LinearLayout.LayoutParams.WRAP_CONTENT;
                 boolean focusable = true; // lets taps outside the popup also dismiss it
                 askPopup = new PopupWindow(popupView, width, height, true);

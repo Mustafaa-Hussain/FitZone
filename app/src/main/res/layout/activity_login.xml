@@ -23,11 +23,11 @@
     app:layout_constraintTop_toTopOf="parent"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <TextView
-        android:layout_gravity="left"
+        android:layout_gravity="start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/loginHeader"
-        android:text="Login"
+        android:text="@string/login"
         android:layout_marginTop="@dimen/loginViewsMargin"/>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -59,14 +59,14 @@
     <Button
         android:id="@+id/loginBT"
         style="@style/loginButton"
-        android:text="Login"
+        android:text="@string/login"
         android:layout_gravity="right"
         android:layout_marginTop="@dimen/loginViewsMargin"
-        android:onClick="login" />
+        android:onClick="login"
+        android:textAllCaps="false" />
 
     <TextView
         style="@style/parent"
-        android:textAlignment="textEnd"
         android:textStyle="bold"
         android:textColor="@color/primaryTextColor"
         android:text="@string/login_signup_hint"
@@ -77,10 +77,9 @@
 
     <TextView
         style="@style/parent"
-        android:textAlignment="textEnd"
         android:textStyle="normal"
         android:textColor="@color/primaryTextColor"
-        android:text="Change Server Ip"
+        android:text="@string/setIpaAndPort"
         android:layout_marginTop="@dimen/loginViewsMargin"
         android:onClick="changeServerIp"
         android:padding="5dp"/>

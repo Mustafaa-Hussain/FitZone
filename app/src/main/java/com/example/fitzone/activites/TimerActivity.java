@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -21,11 +20,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONObject;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.security.auth.callback.Callback;
-
 import pl.droidsonroids.gif.GifImageView;
 
 public class TimerActivity extends AppCompatActivity {
@@ -35,6 +29,7 @@ public class TimerActivity extends AppCompatActivity {
     int seconds, minutes;
 
     String trainingNameString;
+    String trainingNumberString;
 
     Button yes, no;
 
@@ -63,6 +58,7 @@ public class TimerActivity extends AppCompatActivity {
         Intent intent = getIntent();
         intent = getIntent();
         trainingNameString = intent.getStringExtra("TName");
+        trainingNumberString = intent.getStringExtra("TNo");
 
         TextView trainingName = findViewById(R.id.training_name);
         trainingName.setText(trainingNameString);
@@ -110,7 +106,7 @@ public class TimerActivity extends AppCompatActivity {
                     Toast.makeText(TimerActivity.this, result, Toast.LENGTH_SHORT).show();//////////
 
                     String caption, content;
-                    caption = trainingNameString;
+                    caption =  trainingNumberString + ' ' + trainingNameString;
                     content = result;
 
                     //popup window to ask user if want to share his time
@@ -140,7 +136,7 @@ public class TimerActivity extends AppCompatActivity {
         View popupView = inflater.inflate(R.layout.ask_if_yes_or_no, null);///
 
         // create the popup window
-        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int width = LinearLayout.LayoutParams.MATCH_PARENT;
         int height = LinearLayout.LayoutParams.WRAP_CONTENT;
         boolean focusable = true; // lets taps outside the popup also dismiss it
         askPopup = new PopupWindow(popupView, width, height, true);
