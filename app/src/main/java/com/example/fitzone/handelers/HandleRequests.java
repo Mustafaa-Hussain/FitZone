@@ -248,7 +248,7 @@ public class HandleRequests {
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void addPost(String caption, String content, String apiToken, final VolleyResponseListener volleyResponseListener){
+    public void addPost(String caption, String content, int poetType, String apiToken, final VolleyResponseListener volleyResponseListener){
 
         final int[] statusCode = { 0 };
         boolean status[] = { false };
@@ -258,6 +258,7 @@ public class HandleRequests {
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("caption",caption);
             jsonBody.put("content",content);
+            jsonBody.put("type",poetType);
 
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, jsonBody,
                     new Response.Listener<JSONObject>() {

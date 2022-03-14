@@ -214,5 +214,7 @@
     <string name="timer">Timer</string>
     <string name="no">No</string>
     <string name="yes">Yes</string>
+    <string name="more_mesage">Info about publisher</string>
+    <string name="share_mesege">You want to share this result with yor friends: </string>
 
 </resources>

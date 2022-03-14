@@ -1,13 +1,18 @@
 package com.example.fitzone.recycleViewAdapters;
 
 import android.content.Context;
+
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.example.fitzone.activites.R;
 import com.example.fitzone.handelers.HandlePost;
@@ -24,11 +29,14 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecycleView
     HandlePost handlePost;
     Context context;
 
+    int[] colors;
+
     // data is passed into the constructor
-    public RecycleViewAdapterForPosts(Context context, JSONArray arrayOfPosts) {
+    public RecycleViewAdapterForPosts(Context context, JSONArray arrayOfPosts, int [] colors) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = arrayOfPosts;
         this.context = context;
+        this.colors = colors;
     }
 
     // inflates the row layout from xml when needed
@@ -43,6 +51,7 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecycleView
     public void onBindViewHolder(ViewHolder holder, int position) {
         try {
             JSONObject post = mData.getJSONObject(position);
+
             holder.username.setText(post.getString("username"));
 //            holder.userAvatar.setImage//;
             holder.initDate.setText(post.getString("created_at").substring(0, post.getString("created_at").indexOf('T')));
@@ -60,6 +69,35 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecycleView
             handlePost.setPostData(post);
 
             handlePost.setLikeButtonState(holder.like,post.getString("id"));
+
+            switch (post.getInt("type")){
+                case 0://default post
+                    holder.mainPostCV.setCardBackgroundColor(colors[0]);
+                    holder.postRatingBar.setVisibility(View.GONE);
+                    holder.postImage.setVisibility(View.GONE);
+                    holder.postVideo.setVisibility(View.GONE);
+                    break;
+                case 1://post with rating bar
+                    holder.mainPostCV.setCardBackgroundColor(colors[1]);
+                    holder.postImage.setVisibility(View.GONE);
+                    holder.postVideo.setVisibility(View.GONE);
+                    break;
+                case 2://post with image
+                    holder.mainPostCV.setCardBackgroundColor(colors[2]);
+                    holder.postRatingBar.setVisibility(View.GONE);
+                    holder.postVideo.setVisibility(View.GONE);
+                    break;
+                case 3://post with video
+                    holder.mainPostCV.setCardBackgroundColor(colors[3]);
+                    holder.postRatingBar.setVisibility(View.GONE);
+                    holder.postImage.setVisibility(View.GONE);
+                    break;
+                default://default
+                    holder.postRatingBar.setVisibility(View.GONE);
+                    holder.postImage.setVisibility(View.GONE);
+                    holder.postVideo.setVisibility(View.GONE);
+                    break;
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -82,7 +120,12 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecycleView
         noOfLikes,
         noOfComments;
 
-        ImageView profileImage;
+        ImageView profileImage,
+        postImage;
+        VideoView postVideo;
+        RatingBar postRatingBar;
+
+        CardView mainPostCV;
 
         Button comment, like, more;
 
@@ -99,6 +142,11 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecycleView
             like = itemView.findViewById(R.id.like);
             comment = itemView.findViewById(R.id.comment);
             more = itemView.findViewById(R.id.more);
+
+            postRatingBar = itemView.findViewById(R.id.rating_bar_post);
+            postImage = itemView.findViewById(R.id.image_post);
+            postVideo = itemView.findViewById(R.id.video_post);
+            mainPostCV = itemView.findViewById(R.id.main_post_cv);
 
             like.setOnClickListener(this);
             comment.setOnClickListener(this);

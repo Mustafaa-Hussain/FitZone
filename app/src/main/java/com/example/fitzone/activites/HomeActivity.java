@@ -76,8 +76,9 @@ public class HomeActivity extends HandelCommon implements RecycleViewAdapterForP
 
                                 if(!caption.getText().equals("") && !content.getText().equals("")){
 
+                                    int postType = 0;
                                     HandleRequests handleRequests = new HandleRequests(HomeActivity.this);
-                                    handleRequests.addPost(caption.getText().toString(), content.getText().toString(), apiToken,
+                                    handleRequests.addPost(caption.getText().toString(), content.getText().toString(), postType,apiToken,
                                             new HandleRequests.VolleyResponseListener() {
                                                 @Override
                                                 public void onResponse(boolean status, JSONObject jsonObject) {
@@ -122,7 +123,7 @@ public class HomeActivity extends HandelCommon implements RecycleViewAdapterForP
 
                             @Override
                             public boolean onTouch(View v, MotionEvent event) {
-                                popupWindow.dismiss();
+//                                popupWindow.dismiss();
                                 return true;
                             }
                         });
@@ -135,11 +136,19 @@ public class HomeActivity extends HandelCommon implements RecycleViewAdapterForP
             public void onResponse(boolean status, JSONObject jsonObject) {
                 if(status){
                     recyclerView = findViewById(R.id.recycleView);
-                    recyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this));
+
                     try {
-                        adapter = new RecycleViewAdapterForPosts(HomeActivity.this, jsonObject.getJSONArray("posts"));
+                        int [] colors ={
+                                getResources().getColor(R.color.regular_post_gray),
+                                getResources().getColor(R.color.achievement_post_yellow),
+                                getResources().getColor(R.color.image_post),
+                                getResources().getColor(R.color.video_post)
+                        };
+                        adapter = new RecycleViewAdapterForPosts(HomeActivity.this, jsonObject.getJSONArray("posts"), colors);
                         adapter.setClickListener(HomeActivity.this);
+                        recyclerView.setHasFixedSize(true);
                         recyclerView.setAdapter(adapter);
+                        recyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -201,14 +210,14 @@ public class HomeActivity extends HandelCommon implements RecycleViewAdapterForP
 
 
                 //put the message
-                ((TextView)popupView.findViewById(R.id.messageQ)).setText("Info about publisher...");
+                ((TextView)popupView.findViewById(R.id.messageQ)).setText(R.string.more_mesage);
 
 
                 // show the popup window
                 // which view you pass in doesn't matter, it is only used for the window token
                 askPopup.showAtLocation(view, Gravity.CENTER, 0, 0);
 
-                ((LinearLayout)popupView.findViewById(R.id.yes_no_buttons)).setVisibility(View.INVISIBLE);
+                ((LinearLayout)popupView.findViewById(R.id.yes_no_buttons)).setVisibility(View.GONE);
                 //get info about user that post this post
 
                 // dismiss the popup window when touched

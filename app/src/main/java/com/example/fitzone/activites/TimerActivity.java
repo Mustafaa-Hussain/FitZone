@@ -143,7 +143,7 @@ public class TimerActivity extends AppCompatActivity {
 
 
         //put the message
-        ((TextView)popupView.findViewById(R.id.messageQ)).setText("You want to share this result with yor friends: " + content + " ?");
+        ((TextView)popupView.findViewById(R.id.messageQ)).setText(getResources().getString(R.string.share_mesege) + content + " ?");
 
 
         // show the popup window
@@ -158,7 +158,8 @@ public class TimerActivity extends AppCompatActivity {
                 String apiToken = getSharedPreferences("UserData", MODE_PRIVATE).getString("apiToken", null);
                 HandleRequests handleRequests = new HandleRequests(TimerActivity.this);
 
-                handleRequests.addPost(caption, content,apiToken,
+                int postType = 1;//for training not regular post
+                handleRequests.addPost(caption, content, postType, apiToken,
                     new HandleRequests.VolleyResponseListener() {
                         @Override
                         public void onResponse(boolean status, JSONObject jsonObject) {

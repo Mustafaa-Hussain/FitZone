@@ -23,7 +23,11 @@
     <color name="primaryTextColor">#2661FA</color>
     <color name="loginBkColor">#f0f0f0</color>
 
-    <!--colros for card-->
+    <!--colors for card-->
     <color name="whiteCardColor">#fff</color>
     <color name="semi_white">#80FDFDFD</color>
+    <color name="regular_post_gray">#E4E4E4</color>
+    <color name="achievement_post_yellow">#FFF59F</color>
+    <color name="video_post">#FFC3B1</color>
+    <color name="image_post">#C9FF8B</color>
 </resources>

@@ -100,7 +100,13 @@ public class Profile extends HandelCommon implements RecycleViewAdapterForPosts.
                                             myPosts.put(jsonObject.getJSONArray("posts").getJSONObject(i));
                                         }
                                     }
-                                    adapter = new RecycleViewAdapterForPosts(Profile.this, myPosts);
+                                    int [] colors ={
+                                            getResources().getColor(R.color.regular_post_gray),
+                                            getResources().getColor(R.color.achievement_post_yellow),
+                                            getResources().getColor(R.color.image_post),
+                                            getResources().getColor(R.color.video_post)
+                                    };
+                                    adapter = new RecycleViewAdapterForPosts(Profile.this, myPosts, colors);
                                     adapter.setClickListener(Profile.this);
                                     recyclerView.setAdapter(adapter);
                                 } catch (JSONException e) {
@@ -152,8 +158,9 @@ public class Profile extends HandelCommon implements RecycleViewAdapterForPosts.
 
                         if(!caption.getText().equals("") && !content.getText().equals("")){
 
+                            int postType = 0;
                             HandleRequests handleRequests = new HandleRequests(Profile.this);
-                            handleRequests.addPost(caption.getText().toString(), content.getText().toString(), apiToken,
+                            handleRequests.addPost(caption.getText().toString(), content.getText().toString(), postType, apiToken,
                                     new HandleRequests.VolleyResponseListener() {
                                         @Override
                                         public void onResponse(boolean status, JSONObject jsonObject) {
