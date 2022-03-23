@@ -6,9 +6,12 @@
         <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/drawable/button.xml" value="0.22552083333333334" />
         <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/drawable/comment_icon.xml" value="0.11614583333333334" />
         <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/drawable/home_icon.xml" value="0.22205128205128205" />
+        <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/drawable/ic__787503_back_arrow_direction_down_right_icon.xml" value="0.22552083333333334" />
         <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/drawable/ic_switch_camera_white_48dp.xml" value="0.22552083333333334" />
         <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/drawable/like_button.xml" value="0.22552083333333334" />
+        <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/drawable/min_one.xml" value="0.22552083333333334" />
         <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/drawable/more_button.xml" value="0.22552083333333334" />
+        <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/drawable/plus_one.xml" value="0.22552083333333334" />
         <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/drawable/toggle_style.xml" value="0.22552083333333334" />
         <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/drawable/training_icon.xml" value="0.22205128205128205" />
         <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/layout-v28/post_structure_row.xml" value="0.1816123188405797" />
@@ -51,7 +54,14 @@
         <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/layouts/post_structures/layout/achevement_post_structure_row.xml" value="0.17708333333333334" />
         <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/layouts/post_structures/layout/common_post_barts.xml" value="0.22" />
         <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/layouts/post_structures/layout/image_post_structure_row.xml" value="0.17708333333333334" />
-        <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/layouts/post_structures/layout/post_structure_row.xml" value="0.33" />
+        <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/layouts/post_structures/layout/post_button_section.xml" value="0.23218142548596113" />
+        <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/layouts/post_structures/layout/post_info.xml" value="0.1265625" />
+        <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/layouts/post_structures/layout/post_structure_row.xml" value="0.25" />
+        <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/layouts/post_structures/layout/post_structure_row_basic.xml" value="0.16259057971014493" />
+        <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/layouts/post_structures/layout/post_structure_row_image.xml" value="0.16259057971014493" />
+        <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/layouts/post_structures/layout/post_structure_row_raiting.xml" value="0.16259057971014493" />
+        <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/layouts/post_structures/layout/post_structure_row_rating.xml" value="0.33" />
+        <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/layouts/post_structures/layout/post_structure_row_video.xml" value="0.16259057971014493" />
         <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/layouts/post_structures/layout/post_test.xml" value="0.17708333333333334" />
         <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.22552083333333334" />
         <entry key="..\:/Mustafa/study/Graduation_project/FitZone/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.14270833333333333" />

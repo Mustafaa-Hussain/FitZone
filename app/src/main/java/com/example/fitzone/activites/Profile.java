@@ -70,8 +70,8 @@ public class Profile extends HandelCommon implements RecycleViewAdapterForPosts.
             }
 
         });
-
-
+//path for default user avatar
+//storage/avatars/avatar.gif
 //request and display user profile
 
         HandleRequests handleRequests = new HandleRequests(Profile.this);
