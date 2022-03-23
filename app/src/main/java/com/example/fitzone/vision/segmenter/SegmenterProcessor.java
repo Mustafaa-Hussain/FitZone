@@ -17,14 +17,12 @@
 package com.example.fitzone.vision.segmenter;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
 import android.util.Log;
-
-import com.example.fitzone.vision.posedetector.VisionProcessorBase;
+import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.Task;
 import com.google.mlkit.vision.common.InputImage;
 import com.example.fitzone.vision.GraphicOverlay;
-import com.example.fitzone.vision.posedetector.VisionProcessorBase;
+import com.example.fitzone.vision.VisionProcessorBase;
 import com.example.fitzone.vision.preference.PreferenceUtils;
 import com.google.mlkit.vision.segmentation.Segmentation;
 import com.google.mlkit.vision.segmentation.SegmentationMask;

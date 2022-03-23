@@ -131,7 +131,7 @@ public class DayActivity extends HandelCommon implements RecycleViewAdapterForPr
                         try {
                             Toast.makeText(DayActivity.this, "beginning " + object.getString("TName"), Toast.LENGTH_SHORT).show();
 
-                            Intent intent = new Intent(DayActivity.this, LiveCamera.class);
+                            Intent intent = new Intent(DayActivity.this, LivePreviewActivity.class);
                             startActivity(intent);
 
                         } catch (JSONException e) {

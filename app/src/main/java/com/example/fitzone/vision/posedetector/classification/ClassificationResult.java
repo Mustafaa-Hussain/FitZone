@@ -16,11 +16,11 @@
 
 package com.example.fitzone.vision.posedetector.classification;
 
-import static java.util.Collections.max;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import static java.util.Collections.max;
 
 /**
  * Represents Pose classification result as outputted by {@link PoseClassifier}. Can be manipulated.

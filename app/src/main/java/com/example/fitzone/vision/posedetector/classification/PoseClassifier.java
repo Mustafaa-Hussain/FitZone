@@ -26,11 +26,9 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import android.util.Pair;
-
 import com.google.mlkit.vision.common.PointF3D;
 import com.google.mlkit.vision.pose.Pose;
 import com.google.mlkit.vision.pose.PoseLandmark;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;

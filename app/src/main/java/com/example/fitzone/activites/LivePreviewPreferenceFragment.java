@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.example.fitzone.vision.preference;
+package com.example.fitzone.activites;
 
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
-
 import androidx.annotation.StringRes;
-
-import com.example.fitzone.activites.R;
 import com.example.fitzone.vision.CameraSource;
 import com.example.fitzone.vision.CameraSource.SizePair;
+import com.example.fitzone.vision.preference.PreferenceUtils;
 
 import java.util.HashMap;
 import java.util.List;

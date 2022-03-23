@@ -19,7 +19,6 @@ package com.example.fitzone.vision.posedetector.classification;
 import static com.google.common.primitives.Floats.max;
 
 import com.google.mlkit.vision.common.PointF3D;
-
 import java.util.List;
 import java.util.ListIterator;
 

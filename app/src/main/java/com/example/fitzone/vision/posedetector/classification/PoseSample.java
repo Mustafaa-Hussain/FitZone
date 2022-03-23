@@ -17,10 +17,8 @@
 package com.example.fitzone.vision.posedetector.classification;
 
 import android.util.Log;
-
 import com.google.common.base.Splitter;
 import com.google.mlkit.vision.common.PointF3D;
-
 import java.util.ArrayList;
 import java.util.List;
 

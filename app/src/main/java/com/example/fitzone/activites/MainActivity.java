@@ -18,6 +18,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //for test only
+        Intent testIntent;
+        testIntent = new Intent(MainActivity.this, LivePreviewActivity.class);
+        startActivity(testIntent);
+        finish();
+        //
         if (android.os.Build.VERSION.SDK_INT > 9)
         {
             StrictMode.ThreadPolicy policy = new

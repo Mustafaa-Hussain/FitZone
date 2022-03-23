@@ -24,7 +24,6 @@ import static com.example.fitzone.vision.posedetector.classification.Utils.subtr
 
 import com.google.mlkit.vision.common.PointF3D;
 import com.google.mlkit.vision.pose.PoseLandmark;
-
 import java.util.ArrayList;
 import java.util.List;
 

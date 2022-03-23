@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.fitzone.vision.posedetector;
+package com.example.fitzone.vision;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -25,16 +25,14 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build.VERSION_CODES;
 import android.os.SystemClock;
+import androidx.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
-
 import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.camera.core.ExperimentalGetImage;
 import androidx.camera.core.ImageProxy;
-
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskExecutors;
 import com.google.android.gms.tasks.Tasks;
@@ -43,17 +41,8 @@ import com.google.android.odml.image.ByteBufferMlImageBuilder;
 import com.google.android.odml.image.MediaMlImageBuilder;
 import com.google.android.odml.image.MlImage;
 import com.google.mlkit.common.MlKitException;
-import com.example.fitzone.vision.BitmapUtils;
 import com.google.mlkit.vision.common.InputImage;
-import com.example.fitzone.vision.CameraImageGraphic;
-import com.example.fitzone.vision.FrameMetadata;
-import com.example.fitzone.vision.GraphicOverlay;
-import com.example.fitzone.vision.InferenceInfoGraphic;
-import com.example.fitzone.vision.ScopedExecutor;
-import com.example.fitzone.vision.TemperatureMonitor;
-import com.example.fitzone.vision.VisionImageProcessor;
 import com.example.fitzone.vision.preference.PreferenceUtils;
-
 import java.nio.ByteBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -212,7 +201,7 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
 
   // -----------------Code for processing live preview frame from CameraX API-----------------------
   @Override
-  @RequiresApi(VERSION_CODES.KITKAT)
+  @RequiresApi(VERSION_CODES.LOLLIPOP)
   @ExperimentalGetImage
   public void processImageProxy(ImageProxy image, GraphicOverlay graphicOverlay) {
     long frameStartMs = SystemClock.elapsedRealtime();
