@@ -38,4 +38,11 @@ public class Reconnect extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
+    public void goToTrainingPage(View view) {
+        Intent testIntent;
+        testIntent = new Intent(Reconnect.this, LivePreviewActivity.class);
+        startActivity(testIntent);
+        finish();
+    }
 }
