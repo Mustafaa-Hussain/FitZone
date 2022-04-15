@@ -2,7 +2,9 @@ package com.example.fitzone.activites;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.IpSecManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
@@ -25,107 +27,116 @@ import pl.droidsonroids.gif.GifImageView;
 public class TimerActivity extends AppCompatActivity {
 
     TextView timerTextView;
-    long startTime = 0;
-    int seconds, minutes;
 
-    String trainingNameString;
-    String trainingNumberString;
+    String trainingName;
+    int trainingReps,
+            trainingSets,
+            trainingSetNumber,
+            lastTime;
 
     Button yes, no;
 
-    //runs without a timer by reposting this handler at the end of the runnable
     Handler timerHandler = new Handler();
-    Runnable timerRunnable = new Runnable() {
+    Runnable timerRunnable = null;
+    //timer that take a time and wait for it
+    private void waitTime(int limit){
+        timerRunnable = new Runnable() {
+            int seconds;
+            final long startTime = System.currentTimeMillis();
+            @SuppressLint("DefaultLocale")
+            @Override
+            public void run() {
+                long millis = System.currentTimeMillis() - startTime;
+                seconds = (int) (millis / 1000);
 
-        @Override
-        public void run() {
-            long millis = System.currentTimeMillis() - startTime;
-            seconds = (int) (millis / 1000);
-            minutes = seconds / 60;
-            seconds = seconds % 60;
+                if(seconds >= limit) {
+                    timerHandler.removeCallbacks(this);
+                    goToLivePreviewActivity();
+                    return;
+                }
 
-            timerTextView.setText(String.format("%d:%02d", minutes, seconds));
+                timerTextView.setText(String.format("%02d", limit - seconds));
 
-            timerHandler.postDelayed(this, 500);
-        }
-    };
+                timerHandler.postDelayed(this, 1000);
+            }
+        };
+        timerHandler.postDelayed(timerRunnable, 0);
+    }
 
+    private void goToLivePreviewActivity(){
+        Intent intent = new Intent(getApplicationContext(), LivePreviewActivity.class);
+        intent.putExtra("TName", trainingName);
+        intent.putExtra("TReps", trainingReps);
+        intent.putExtra("TSets", trainingSets);
+        intent.putExtra("setNumber", trainingSetNumber);
+        intent.putExtra("lastTime", lastTime);
+        startActivity(intent);
+        finish();
+    }
+
+    @SuppressLint({"SetTextI18n", "DefaultLocale"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timer);
 
-        Intent intent = getIntent();
-        intent = getIntent();
-        trainingNameString = intent.getStringExtra("TName");
-        trainingNumberString = intent.getStringExtra("TNo");
+        timerTextView = findViewById(R.id.timer);
 
-        TextView trainingName = findViewById(R.id.training_name);
-        trainingName.setText(trainingNameString);
+        Intent intent = getIntent();
+        trainingName = intent.getStringExtra("TName");
+        trainingReps = intent.getIntExtra("TReps", 1);
+        trainingSets = intent.getIntExtra("TSets", 1);
+        trainingSetNumber = intent.getIntExtra("setNumber", 1);
+        lastTime = intent.getIntExtra("lastTime", 0);//for store last set taken time
+
+        if(trainingSetNumber > 1) {
+            if(trainingSetNumber > trainingSets){
+                timerHandler.removeCallbacks(timerRunnable);
+                timerTextView.setTextSize(20);
+                timerTextView.setText(String.format("%s \n %d X %d in %d seconds.", trainingName, trainingReps, trainingSets, lastTime));
+//            askToShareOrNot(trainingName, String.format("%d X %d in %d seconds.", trainingReps, trainingSets, lastTime), timerTextView);
+            }
+            else{
+                waitTime(30a);//wait 10 seconds then move to @link{LivePreviewActivity}
+            }
+
+        }
+        else {
+            waitTime(15);
+        }
+
+        @SuppressLint("DefaultLocale")
+        String trainData = String.format("%s %d : %d %s",
+                getResources().getString(R.string.group_number),
+                trainingSetNumber,
+                trainingReps,
+                getResources().getString(R.string.times));
+
+        TextView trainingData = findViewById(R.id.training_name);
+
+        trainingData.setText(trainingName + "\n" + trainData);
 
         GifImageView gifImageView = findViewById(R.id.training_gif_file);
 
         //check and assign image to each training
-        if(trainingNameString.equals("Squat"))
+        if(trainingData.equals(getString(R.string.squat)))
             gifImageView.setImageResource(R.drawable.dynamic_squat);
-        else if(trainingNameString.equals("Push-ups"))
+        else if(trainingData.equals(getString(R.string.push_ups)))
             gifImageView.setImageResource(R.drawable.dynamic_push_ups);
         else
             gifImageView.setImageResource(R.drawable.dynamic_squat);
-
-
-        timerTextView = (TextView) findViewById(R.id.timer);
-
-        Button b = (Button) findViewById(R.id.start);
-        b.setText("start");
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Button b = (Button) v;
-                if (b.getText().equals("reset")) {
-                    timerHandler.removeCallbacks(timerRunnable);
-                    b.setText("start");
-                } else {
-                    startTime = System.currentTimeMillis();
-                    timerHandler.postDelayed(timerRunnable, 0);
-                    b.setText("reset");
-                }
-            }
-        });
-
-        Button finish = findViewById(R.id.finish);
-        finish.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!timerTextView.getText().equals("Timer")){
-
-                    timerHandler.removeCallbacks(timerRunnable);
-                    b.setText("start");
-
-                    String result = "finished in "+ minutes + " minutes, and " + seconds + " seconds.";
-                    Toast.makeText(TimerActivity.this, result, Toast.LENGTH_SHORT).show();//////////
-
-                    String caption, content;
-                    caption =  trainingNumberString + ' ' + trainingNameString;
-                    content = result;
-
-                    //popup window to ask user if want to share his time
-                    askToShareOrNot(caption, content, v);
-
-                }
-            }
-        });
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        timerHandler.removeCallbacks(timerRunnable);
-        Button b = (Button)findViewById(R.id.start);
-        b.setText("start");
+        if(timerRunnable != null)
+            timerHandler.removeCallbacks(timerRunnable);
+        finish();
     }
 
 
+    //share results after finishes
     public void askToShareOrNot(String caption, String content, View view){
 
         PopupWindow askPopup;
@@ -141,10 +152,8 @@ public class TimerActivity extends AppCompatActivity {
         boolean focusable = true; // lets taps outside the popup also dismiss it
         askPopup = new PopupWindow(popupView, width, height, true);
 
-
         //put the message
         ((TextView)popupView.findViewById(R.id.messageQ)).setText(getResources().getString(R.string.share_mesege) + content + " ?");
-
 
         // show the popup window
         // which view you pass in doesn't matter, it is only used for the window token

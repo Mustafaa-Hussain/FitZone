@@ -25,12 +25,8 @@
     <string name="pref_screen_title_camerax_live_preview" translatable="false">CameraX live preview settings</string>
     <string name="pref_screen_title_cameraxsource_demo" translatable="false">CameraXSource live preview settings</string>
     <string name="pref_category_info" translatable="false">Detection Info</string>
-    <string name="pref_category_face_detection" translatable="false">Face Detection</string>
-    <string name="pref_category_object_detection" translatable="false">Object Detection / Custom Object Detection</string>
-    <string name="pref_category_automl" translatable="false">AutoML Image Labeling</string>
-    <string name="pref_category_pose_detection" translatable="false">Pose Detection</string>
-    <string name="pref_category_segmentation" translatable="false">Selfie Segmentation</string>
-    <string name="pref_category_text_recognition" translatable="false">Text Recognition</string>
+    <string name="pref_category_pose_detection">Pose Detection</string>
+    <string name="pref_category_segmentation">Selfie Segmentation</string>
 
     <!-- Strings for camera settings. -->
     <string name="pref_category_key_camera" translatable="false">pckc</string>
@@ -149,6 +145,7 @@
     <string name="pref_title_segmentation_raw_size_mask" translatable="false">Enable raw size mask</string>
     <string name="pref_key_segmentation_raw_size_mask" translatable="false">srsm</string>
 
+
     <!--    strings for app-->
 
     <string name="app_name">FitZone</string>
@@ -205,12 +202,12 @@
     <string name="new_post">New Post</string>
     <string name="share">Share</string>
     <string name="cancel">Cancel</string>
-    <string name="message_q">Message Q?...</string>
+    <string name="message_q">Message Q?…</string>
     <string name="n_times">N Times</string>
     <string name="begin">Begin</string>
     <string name="begin_without_assistant">Begin without assistant</string>
     <string name="comment_content">Comment Content</string>
-    <string name="find_new_friend">Find new friend...</string>
+    <string name="find_new_friend">Find new friend…</string>
     <string name="search">Search</string>
     <string name="logout">Logout</string>
     <string name="my_posts">My Posts</string>
@@ -223,5 +220,10 @@
     <string name="more_mesage">Info about publisher</string>
     <string name="share_mesege">You want to share this result with yor friends: </string>
     <string name="start_training">Start Training</string>
+    <string name="camera_error">something wrong with your camera</string>
+    <string name="group_number">Group Number</string>
+    <string name="times">Times</string>
+    <string name="push_ups">Push-ups</string>
+    <string name="squat">Squat</string>
 
 </resources>

@@ -25,12 +25,8 @@
     <string name="pref_screen_title_camerax_live_preview" translatable="false">CameraX live preview settings</string>
     <string name="pref_screen_title_cameraxsource_demo" translatable="false">CameraXSource live preview settings</string>
     <string name="pref_category_info" translatable="false">Detection Info</string>
-    <string name="pref_category_face_detection" translatable="false">Face Detection</string>
-    <string name="pref_category_object_detection" translatable="false">Object Detection / Custom Object Detection</string>
-    <string name="pref_category_automl" translatable="false">AutoML Image Labeling</string>
-    <string name="pref_category_pose_detection" translatable="false">Pose Detection</string>
+    <string name="pref_category_pose_detection">Pose Detection</string>
     <string name="pref_category_segmentation" translatable="false">Selfie Segmentation</string>
-    <string name="pref_category_text_recognition" translatable="false">Text Recognition</string>
 
     <!-- Strings for camera settings. -->
     <string name="pref_category_key_camera" translatable="false">pckc</string>
@@ -218,11 +214,16 @@
     <string name="reload">اعادة التحميل</string>
     <string name="ip">عنوان الخادم</string>
     <string name="port">المنفذ</string>
-    <string name="timer">الموقت</string>
+    <string name="timer">المؤقت</string>
     <string name="no">لا</string>
     <string name="yes">نعم</string>
     <string name="more_mesage">معلومات عن الناشر</string>
     <string name="share_mesege">هل تريد مشاركة نتائجك مع زملائك: </string>
     <string name="start_training">بدأ التمرين</string>
+    <string name="camera_error">"يوجد خطأ بالكاميرا"</string>
+    <string name="group_number">"مجموعة رقم"</string>
+    <string name="times">"عدات"</string>
+    <string name="push_ups">ضغط</string>
+    <string name="squat">قرفصاء</string>
 
 </resources>

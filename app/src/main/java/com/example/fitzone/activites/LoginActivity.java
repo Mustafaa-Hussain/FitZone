@@ -1,12 +1,18 @@
 package com.example.fitzone.activites;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.fitzone.handelers.HandleRequests;
 
@@ -108,5 +114,11 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(LoginActivity.this, SetServerIP.class);
         startActivity(intent);
         finish();
+    }
+
+    public void goToTrainingPage(View view) {
+        Intent testIntent;
+        testIntent = new Intent(getApplicationContext(), Training.class);
+        startActivity(testIntent);
     }
 }

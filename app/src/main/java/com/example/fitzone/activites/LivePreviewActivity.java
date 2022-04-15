@@ -17,6 +17,8 @@
 package com.example.fitzone.activites;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,9 +28,9 @@ import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
 import com.example.fitzone.vision.CameraSource;
 import com.example.fitzone.vision.CameraSourcePreview;
 import com.example.fitzone.vision.GraphicOverlay;
@@ -37,17 +39,14 @@ import com.example.fitzone.vision.preference.PreferenceUtils;
 import com.example.fitzone.vision.segmenter.SegmenterProcessor;
 import com.google.android.gms.common.annotation.KeepName;
 import com.google.mlkit.vision.pose.PoseDetectorOptionsBase;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 
 /** Live preview demo for ML Kit APIs. */
 @KeepName
 public final class LivePreviewActivity extends AppCompatActivity
         implements AdapterView.OnItemSelectedListener, CompoundButton.OnCheckedChangeListener {
-  private static final String OBJECT_DETECTION = "Object Detection";
   private static final String POSE_DETECTION = "Pose Detection";
   private static final String SELFIE_SEGMENTATION = "Selfie Segmentation";
 
@@ -56,17 +55,37 @@ public final class LivePreviewActivity extends AppCompatActivity
   private CameraSource cameraSource = null;
   private CameraSourcePreview preview;
   private GraphicOverlay graphicOverlay;
-  private String selectedModel = OBJECT_DETECTION;
+  private String selectedModel = POSE_DETECTION;
 
+  private String trainingName;
+  private int trainingReps;
+  private int trainingSets;
+  private int trainingSetNumber;
+  private int lastTime;
+
+  @SuppressLint("DefaultLocale")
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     Log.d(TAG, "onCreate");
     setContentView(R.layout.activity_vision_live_preview);
 
+    //get data that we send it from source activity and assigen it to vars
+    Intent dataIntent = getIntent();
+    trainingName = dataIntent.getStringExtra("TName");
+    trainingReps = dataIntent.getIntExtra("TReps", 10);
+    trainingSets = dataIntent.getIntExtra("TSets", 3);
+    trainingSetNumber = dataIntent.getIntExtra("setNumber", 1);
+    lastTime = dataIntent.getIntExtra("lastTime", 0);
+
+    //set training data
+    TextView tXVTrainingData = findViewById(R.id.tx_v_training_data);
+    tXVTrainingData.setText(String.format("%s\n%d R X %d S", trainingName, trainingReps, trainingSets));
+
     preview = findViewById(R.id.preview_view);
     if (preview == null) {
       Log.d(TAG, "Preview is null");
+      Toast.makeText(this, R.string.camera_error, Toast.LENGTH_SHORT).show();
     }
     graphicOverlay = findViewById(R.id.graphic_overlay);
     if (graphicOverlay == null) {
@@ -100,6 +119,7 @@ public final class LivePreviewActivity extends AppCompatActivity
 
     createCameraSource(selectedModel);
   }
+
 
   @Override
   public synchronized void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
@@ -141,7 +161,7 @@ public final class LivePreviewActivity extends AppCompatActivity
       switch (model) {
         case POSE_DETECTION:
           PoseDetectorOptionsBase poseDetectorOptions =
-                  PreferenceUtils.getPoseDetectorOptionsForLivePreview(this);
+                  PreferenceUtils.getPoseDetectorOptionsForLivePreview(LivePreviewActivity.this);
           Log.i(TAG, "Using Pose Detector with options " + poseDetectorOptions);
           boolean shouldShowInFrameLikelihood =
                   PreferenceUtils.shouldShowPoseDetectionInFrameLikelihoodLivePreview(this);
@@ -150,13 +170,13 @@ public final class LivePreviewActivity extends AppCompatActivity
           boolean runClassification = PreferenceUtils.shouldPoseDetectionRunClassification(this);
           cameraSource.setMachineLearningFrameProcessor(
                   new PoseDetectorProcessor(
-                          this,
+                          LivePreviewActivity.this,
                           poseDetectorOptions,
                           shouldShowInFrameLikelihood,
                           visualizeZ,
                           rescaleZ,
                           runClassification,
-                          /* isStreamMode = */ true));
+                          /* isStreamMode = */ true, trainingName, trainingReps, trainingSets, trainingSetNumber, lastTime));
           break;
         case SELFIE_SEGMENTATION:
           cameraSource.setMachineLearningFrameProcessor(new SegmenterProcessor(this));
@@ -220,3 +240,4 @@ public final class LivePreviewActivity extends AppCompatActivity
     }
   }
 }
+

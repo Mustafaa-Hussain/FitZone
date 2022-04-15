@@ -21,8 +21,9 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:layout_margin="10dp"
-            android:text="@string/timer"
-            android:background="@drawable/training_bg"
+            tools:text="@string/timer"
+            android:textSize="25dp"
+            android:background="@drawable/like_button"
             android:textColor="@color/black"/>
 
         <pl.droidsonroids.gif.GifImageView
@@ -30,7 +31,7 @@
             android:id="@+id/training_gif_file"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            android:background="@drawable/training_bg"
+            android:background="@drawable/like_button"
             android:layout_margin="10dp"
             android:src="@drawable/dynamic_push_ups"
             />
@@ -43,8 +44,8 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:layout_margin="40dp"
-            android:text="Timer"
-            android:textSize="30dp"
+            tools:text="Timer"
+            android:textSize="60sp"
             android:textColor="@color/black"/>
         <Button
             android:layout_width="match_parent"
@@ -53,7 +54,8 @@
             android:layout_margin="25dp"
             android:text="@string/start"
             android:id="@+id/start"
-            android:textAllCaps="false"/>
+            android:textAllCaps="false"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/finish"
@@ -62,7 +64,8 @@
             android:background="@drawable/like_button"
             android:layout_margin="25dp"
             android:text="@string/finish"
-            android:textAllCaps="false"/>
+            android:textAllCaps="false"
+            android:visibility="gone"/>
 
     </LinearLayout>
 

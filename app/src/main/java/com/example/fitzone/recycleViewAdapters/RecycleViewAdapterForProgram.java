@@ -46,9 +46,9 @@ public class RecycleViewAdapterForProgram extends RecyclerView.Adapter<RecycleVi
             holder.programNo.setText(training.getString("TReps") + " X " + training.getString("TSets"));
 
             //check and assign image to each training
-            if(training.getString("TName").equals("Squat"))
+            if(training.getString("TName").equals(context.getString(R.string.squat)))
                 holder.programImage.setImageResource(R.drawable.static_squat);
-            else if(training.getString("TName").equals("Push-ups"))
+            else if(training.getString("TName").equals(context.getString(R.string.push_ups)))
                 holder.programImage.setImageResource(R.drawable.static_pushups);
             else
                 holder.programImage.setImageResource(R.drawable.blank_training);

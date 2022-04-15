@@ -70,7 +70,7 @@ public class PreferenceUtils {
   public static boolean shouldHideDetectionInfo(Context context) {
     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     String prefKey = context.getString(R.string.pref_key_info_hide);
-    return sharedPreferences.getBoolean(prefKey, false);
+    return sharedPreferences.getBoolean(prefKey, true);
   }
 
   public static PoseDetectorOptionsBase getPoseDetectorOptionsForLivePreview(Context context) {
@@ -109,7 +109,7 @@ public class PreferenceUtils {
     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     String prefKey =
             context.getString(R.string.pref_key_live_preview_pose_detector_show_in_frame_likelihood);
-    return sharedPreferences.getBoolean(prefKey, true);
+    return sharedPreferences.getBoolean(prefKey, false);
   }
 
   public static boolean shouldPoseDetectionVisualizeZ(Context context) {
@@ -127,13 +127,13 @@ public class PreferenceUtils {
   public static boolean shouldPoseDetectionRunClassification(Context context) {
     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     String prefKey = context.getString(R.string.pref_key_pose_detector_run_classification);
-    return sharedPreferences.getBoolean(prefKey, false);
+    return sharedPreferences.getBoolean(prefKey, true);
   }
 
   public static boolean shouldSegmentationEnableRawSizeMask(Context context) {
     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     String prefKey = context.getString(R.string.pref_key_segmentation_raw_size_mask);
-    return sharedPreferences.getBoolean(prefKey, false);
+    return sharedPreferences.getBoolean(prefKey, true);
   }
 
   /**
@@ -151,7 +151,7 @@ public class PreferenceUtils {
   public static boolean isCameraLiveViewportEnabled(Context context) {
     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     String prefKey = context.getString(R.string.pref_key_camera_live_viewport);
-    return sharedPreferences.getBoolean(prefKey, false);
+    return sharedPreferences.getBoolean(prefKey, true);
   }
 
   private PreferenceUtils() {}

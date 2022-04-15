@@ -75,8 +75,7 @@
 
         <activity
             android:name=".LivePreviewActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:exported="false"/>
         <activity
             android:name=".SettingsActivity"
             android:exported="false"

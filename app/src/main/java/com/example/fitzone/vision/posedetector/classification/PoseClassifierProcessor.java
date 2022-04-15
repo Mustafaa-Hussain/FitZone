@@ -22,6 +22,8 @@ import android.media.ToneGenerator;
 import android.os.Looper;
 import android.util.Log;
 import androidx.annotation.WorkerThread;
+
+import com.example.fitzone.activites.R;
 import com.google.common.base.Preconditions;
 import com.google.mlkit.vision.pose.Pose;
 import java.io.BufferedReader;
@@ -43,9 +45,7 @@ public class PoseClassifierProcessor {
   // for your pose samples.
   private static final String PUSHUPS_CLASS = "pushups_down";
   private static final String SQUATS_CLASS = "squats_down";
-  private static final String[] POSE_CLASSES = {
-    PUSHUPS_CLASS, SQUATS_CLASS
-  };
+  private static final String[] POSE_CLASSES = { PUSHUPS_CLASS, SQUATS_CLASS };
 
   private final boolean isStreamMode;
 
@@ -54,8 +54,13 @@ public class PoseClassifierProcessor {
   private PoseClassifier poseClassifier;
   private String lastRepResult;
 
+  private final String trainingName;
+
   @WorkerThread
-  public PoseClassifierProcessor(Context context, boolean isStreamMode) {
+  public PoseClassifierProcessor(Context context, boolean isStreamMode, String trainingName) {
+
+    this.trainingName = trainingName;
+
     Preconditions.checkState(Looper.myLooper() != Looper.getMainLooper());
     this.isStreamMode = isStreamMode;
     if (isStreamMode) {
@@ -85,9 +90,10 @@ public class PoseClassifierProcessor {
     }
     poseClassifier = new PoseClassifier(poseSamples);
     if (isStreamMode) {
-      for (String className : POSE_CLASSES) {
-        repCounters.add(new RepetitionCounter(className));
-      }
+      if(trainingName.equals(context.getResources().getString(R.string.push_ups)))
+        repCounters.add(new RepetitionCounter(POSE_CLASSES[0]));
+      else //Squat case
+        repCounters.add(new RepetitionCounter(POSE_CLASSES[1]));
     }
   }
 

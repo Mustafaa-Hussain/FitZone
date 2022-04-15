@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,10 +22,6 @@ public class Training extends HandelCommon implements RecycleViewAdapterForDaysP
 
     RecycleViewAdapterForDaysPrograms adapter;
     RecyclerView recyclerView;
-
-    PopupWindow popupWindow;
-
-    int intentCode = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +40,7 @@ public class Training extends HandelCommon implements RecycleViewAdapterForDaysP
         myDays.put("Day-5 Wed");
 
         recyclerView = findViewById(R.id.recycleViewOfPrograms);
-        recyclerView.setLayoutManager(new LinearLayoutManager(Training.this));
+        recyclerView.setLayoutManager(new GridLayoutManager(Training.this, 2));
         adapter = new RecycleViewAdapterForDaysPrograms(Training.this, myDays);
         adapter.setClickListener(Training.this);
         recyclerView.setAdapter(adapter);
@@ -62,7 +59,7 @@ public class Training extends HandelCommon implements RecycleViewAdapterForDaysP
         Intent intent;
         intent = new Intent(Training.this, DayActivity.class);
         intent.putExtra("day", day);
-        startActivityForResult(intent, intentCode);
+        startActivity(intent);
 
 //        imv.setImageResource(R.drawable.unchecked_box);
     }

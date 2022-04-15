@@ -1,6 +1,10 @@
 package com.example.fitzone.activites;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -12,6 +16,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -49,19 +54,19 @@ public class DayActivity extends HandelCommon implements RecycleViewAdapterForPr
         JSONArray myTrainings = new JSONArray();
 
         try {
-            myDay.put("TName", "Push-ups");
+            myDay.put("TName", getString(R.string.push_ups));
             myDay.put("TReps", 15);
             myDay.put("TSets", 3);
             myTrainings.put(myDay);
 
             myDay = new JSONObject();
-            myDay.put("TName", "Squat");
+            myDay.put("TName", getString(R.string.squat));
             myDay.put("TReps", 10);
             myDay.put("TSets", 3);
             myTrainings.put(myDay);
 
             myDay = new JSONObject();
-            myDay.put("TName", "Push-ups");
+            myDay.put("TName", getString(R.string.push_ups));
             myDay.put("TReps", 10);
             myDay.put("TSets", 3);
             myTrainings.put(myDay);
@@ -79,6 +84,7 @@ public class DayActivity extends HandelCommon implements RecycleViewAdapterForPr
     }
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onItemClick(View view, int position) {
         if (view.getId() == R.id.start) {
@@ -93,7 +99,7 @@ public class DayActivity extends HandelCommon implements RecycleViewAdapterForPr
             int width = LinearLayout.LayoutParams.MATCH_PARENT;
             int height = LinearLayout.LayoutParams.WRAP_CONTENT;
             boolean focusable = true; // lets taps outside the popup also dismiss it
-            startTraining = new PopupWindow(popupView, width, height, true);
+            startTraining = new PopupWindow(popupView, width, height, focusable);
 
 
             try{
@@ -105,9 +111,9 @@ public class DayActivity extends HandelCommon implements RecycleViewAdapterForPr
                 GifImageView gifImageView = popupView.findViewById(R.id.training_gif_file);
 
                 //check and assign image to each training
-                if(object.getString("TName").equals("Squat"))
+                if(object.getString("TName").equals(getString(R.string.squat)))
                     gifImageView.setImageResource(R.drawable.dynamic_squat);
-                else if(object.getString("TName").equals("Push-ups"))
+                else if(object.getString("TName").equals(getString(R.string.push_ups)))
                     gifImageView.setImageResource(R.drawable.dynamic_push_ups);
                 else
                     gifImageView.setImageResource(R.drawable.dynamic_squat);
@@ -124,39 +130,22 @@ public class DayActivity extends HandelCommon implements RecycleViewAdapterForPr
                 ((TextView)popupView.findViewById(R.id.no)).setText(noOfTrains);
 
                 Button begin = popupView.findViewById(R.id.begin);
-                begin.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View v) {
-                        //for test only
-                        try {
-                            Toast.makeText(DayActivity.this, "beginning " + object.getString("TName"), Toast.LENGTH_SHORT).show();
+                begin.setOnClickListener(
+                        v -> {
+                            try {
+                                Toast.makeText(DayActivity.this, "beginning " + object.getString("TName"), Toast.LENGTH_SHORT).show();
 
-                            Intent intent = new Intent(DayActivity.this, LivePreviewActivity.class);
-                            startActivity(intent);
+                                Intent intent;
+                                intent = new Intent(getApplicationContext(), TimerActivity.class);
+                                intent.putExtra("TName", object.getString("TName"));
+                                intent.putExtra("TReps", object.getInt("TReps"));
+                                intent.putExtra("TSets", object.getInt("TSets"));
+                                intent.putExtra("setNumber", 1);
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-
-                Button beginWithAss = popupView.findViewById(R.id.begin_without_assistant);
-                beginWithAss.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View v) {
-
-                        try {
-                            Intent intent;
-                            Toast.makeText(DayActivity.this, "beginning " + object.getString("TName"), Toast.LENGTH_SHORT).show();
-                            intent = new Intent(DayActivity.this, TimerActivity.class);
-                            intent.putExtra("TName", object.getString("TName"));
-                            intent.putExtra("TNo", object.getString("TReps") + " X " + object.getString("TSets"));
-                            startActivity(intent);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
+                                checkPermission(intent);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                 });
             }
             catch (JSONException e){
@@ -167,16 +156,44 @@ public class DayActivity extends HandelCommon implements RecycleViewAdapterForPr
             // show the popup window
             startTraining.showAtLocation(view, Gravity.CENTER, 0, 0);
 
-
             // dismiss the popup window when touched on any point in the screen
-            popupView.setOnTouchListener(new View.OnTouchListener() {
-
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    startTraining.dismiss();
-                    return true;
-                }
-            });
+            popupView.setOnTouchListener(
+                    (v, event) -> {
+                        startTraining.dismiss();
+                        return true;
+                    });
         }
     }
+
+
+    private void checkPermission(Intent intent) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (this.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                this.requestPermissions(new String[]{Manifest.permission.CAMERA}, 1);
+            }
+            else if(this.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED){
+                startActivity(intent);
+            }
+        }
+        else{
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getApplicationContext(), "Camera Permission was granted", Toast.LENGTH_SHORT).show();
+
+                Intent testIntent;
+                testIntent = new Intent(getApplicationContext(), LivePreviewActivity.class);
+                startActivity(testIntent);
+            } else {
+                Toast.makeText(getApplicationContext(), "Camera Permission was denied\nthis function cannot work\nPlease enable camera permission in settings", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
 }
