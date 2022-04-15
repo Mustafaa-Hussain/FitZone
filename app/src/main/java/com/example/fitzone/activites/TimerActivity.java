@@ -97,7 +97,7 @@ public class TimerActivity extends AppCompatActivity {
 //            askToShareOrNot(trainingName, String.format("%d X %d in %d seconds.", trainingReps, trainingSets, lastTime), timerTextView);
             }
             else{
-                waitTime(30a);//wait 10 seconds then move to @link{LivePreviewActivity}
+                waitTime(30);//wait 10 seconds then move to @link{LivePreviewActivity}
             }
 
         }
