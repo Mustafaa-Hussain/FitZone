@@ -23,7 +23,9 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.util.Log;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
+
 import com.example.fitzone.activites.R;
 import com.example.fitzone.activites.TimerActivity;
 import com.google.android.gms.tasks.Task;
@@ -36,204 +38,210 @@ import com.google.mlkit.vision.pose.Pose;
 import com.google.mlkit.vision.pose.PoseDetection;
 import com.google.mlkit.vision.pose.PoseDetector;
 import com.google.mlkit.vision.pose.PoseDetectorOptionsBase;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-/** A processor to run pose detector. */
+/**
+ * A processor to run pose detector.
+ */
 public class PoseDetectorProcessor
-    extends VisionProcessorBase<PoseDetectorProcessor.PoseWithClassification>{
-  private static final String TAG = "PoseDetectorProcessor";
+        extends VisionProcessorBase<PoseDetectorProcessor.PoseWithClassification> {
+    private static final String TAG = "PoseDetectorProcessor";
 
-  private final PoseDetector detector;
+    private final PoseDetector detector;
 
-  private final boolean showInFrameLikelihood;
-  private final boolean visualizeZ;
-  private final boolean rescaleZForVisualization;
-  private final boolean runClassification;
-  private final boolean isStreamMode;
-  private final Context context;
-  private final Activity activity;
-  private final Executor classificationExecutor;
+    private final boolean showInFrameLikelihood;
+    private final boolean visualizeZ;
+    private final boolean rescaleZForVisualization;
+    private final boolean runClassification;
+    private final boolean isStreamMode;
+    private final Context context;
+    private final Activity activity;
+    private final Executor classificationExecutor;
 
-  private int currentTakenTime;
-  private long startTime;
-  private long endTime;
+    private int currentTakenTime;
+    private long startTime;
+    private long endTime;
 
-  //training data to focuse on it
+    //training data to focuse on it
 
-  private final String trainingName;
-  private final Integer trainingReps;
-  private final Integer trainingSets;
-  private Integer trainingSetNumber;
-  private final Integer lastTime;
+    private final String trainingName;
+    private final Integer trainingReps;
+    private final Integer trainingSets;
+    private Integer trainingSetNumber;
+    private final Integer lastTime;
 
-  private PoseClassifierProcessor poseClassifierProcessor;
-  /** Internal class to hold Pose and classification results. */
-  protected static class PoseWithClassification{
-    private final Pose pose;
-    private final List<String> classificationResult;
+    private PoseClassifierProcessor poseClassifierProcessor;
 
-    public PoseWithClassification(Pose pose, List<String> classificationResult) {
-      this.pose = pose;
-      this.classificationResult = classificationResult;
+    /**
+     * Internal class to hold Pose and classification results.
+     */
+    protected static class PoseWithClassification {
+        private final Pose pose;
+        private final List<String> classificationResult;
+
+        public PoseWithClassification(Pose pose, List<String> classificationResult) {
+            this.pose = pose;
+            this.classificationResult = classificationResult;
+        }
+
+        public Pose getPose() {
+            return pose;
+        }
+
+        public List<String> getClassificationResult() {
+            return classificationResult;
+        }
     }
 
-    public Pose getPose() {
-      return pose;
+    public PoseDetectorProcessor(
+            Activity activity,
+            PoseDetectorOptionsBase options,
+            boolean showInFrameLikelihood,
+            boolean visualizeZ,
+            boolean rescaleZForVisualization,
+            boolean runClassification,
+            boolean isStreamMode,
+            String trainingName,
+            Integer trainingReps,
+            Integer trainingSets,
+            Integer trainingSetNumber,
+            Integer lastTime) {
+
+        super(activity);
+        this.showInFrameLikelihood = showInFrameLikelihood;
+        this.visualizeZ = visualizeZ;
+        this.rescaleZForVisualization = rescaleZForVisualization;
+        detector = PoseDetection.getClient(options);
+        this.runClassification = runClassification;
+        this.isStreamMode = isStreamMode;
+        this.context = activity;
+        this.activity = activity;
+        classificationExecutor = Executors.newSingleThreadExecutor();
+
+        this.trainingName = trainingName;
+        this.trainingReps = trainingReps;
+        this.trainingSets = trainingSets;
+        this.trainingSetNumber = trainingSetNumber;
+        this.lastTime = lastTime;
+
+
+        //store beginning time after perform single train
+        startTime = System.currentTimeMillis();
     }
 
-    public List<String> getClassificationResult() {
-      return classificationResult;
-    }
-  }
-
-  public PoseDetectorProcessor(
-      Activity activity,
-      PoseDetectorOptionsBase options,
-      boolean showInFrameLikelihood,
-      boolean visualizeZ,
-      boolean rescaleZForVisualization,
-      boolean runClassification,
-      boolean isStreamMode,
-      String trainingName,
-      Integer trainingReps,
-      Integer trainingSets,
-      Integer trainingSetNumber,
-      Integer lastTime) {
-
-    super(activity);
-    this.showInFrameLikelihood = showInFrameLikelihood;
-    this.visualizeZ = visualizeZ;
-    this.rescaleZForVisualization = rescaleZForVisualization;
-    detector = PoseDetection.getClient(options);
-    this.runClassification = runClassification;
-    this.isStreamMode = isStreamMode;
-    this.context = activity;
-    this.activity = activity;
-    classificationExecutor = Executors.newSingleThreadExecutor();
-
-    this.trainingName = trainingName;
-    this.trainingReps = trainingReps;
-    this.trainingSets = trainingSets;
-    this.trainingSetNumber = trainingSetNumber;
-    this.lastTime = lastTime;
-
-
-    //store beginning time after perform single train
-    startTime = System.currentTimeMillis();
-  }
-
-  @Override
-  public void stop() {
-    super.stop();
-    detector.close();
-  }
-
-  @Override
-  protected Task<PoseWithClassification> detectInImage(InputImage image) {
-    return detector
-        .process(image)
-        .continueWith(
-            classificationExecutor,
-            task -> {
-              Pose pose = task.getResult();
-              List<String> classificationResult = new ArrayList<>();
-              if (runClassification) {
-                if (poseClassifierProcessor == null) {
-                  poseClassifierProcessor = new PoseClassifierProcessor(context, isStreamMode, trainingName);///passing name to handle each training separately
-                }
-                classificationResult = poseClassifierProcessor.getPoseResult(pose);
-              }
-              return new PoseWithClassification(pose, classificationResult);
-            });
-  }
-
-  @Override
-  protected Task<PoseWithClassification> detectInImage(MlImage image) {
-    return detector
-        .process(image)
-        .continueWith(
-            classificationExecutor,
-            task -> {
-              Pose pose = task.getResult();
-              List<String> classificationResult = new ArrayList<>();
-              if (runClassification) {
-                if (poseClassifierProcessor == null) {
-                  poseClassifierProcessor = new PoseClassifierProcessor(context, isStreamMode, trainingName);
-                }
-                classificationResult = poseClassifierProcessor.getPoseResult(pose);
-              }
-              return new PoseWithClassification(pose, classificationResult);
-            });
-  }
-
-  @Override
-  protected void onSuccess(
-      @NonNull PoseWithClassification poseWithClassification,
-      @NonNull GraphicOverlay graphicOverlay) {
-
-    List<String> result = poseWithClassification.classificationResult;
-
-    ((TextView)activity.findViewById(R.id.tx_v_vision_live)).setText(result.get(0));
-
-
-    int noOfTrains = 0;
-
-    if(!result.get(0).isEmpty()) {
-      try {
-        noOfTrains = Integer.parseInt(result.get(0).substring(result.get(0).indexOf(':') + 2,
-                result.get(0).indexOf("reps") - 1));
-      }catch (NumberFormatException e){
-        Log.d(TAG, e.getMessage());
-      }
+    @Override
+    public void stop() {
+        super.stop();
+        detector.close();
     }
 
+    @Override
+    protected Task<PoseWithClassification> detectInImage(InputImage image) {
+        return detector
+                .process(image)
+                .continueWith(
+                        classificationExecutor,
+                        task -> {
+                            Pose pose = task.getResult();
+                            List<String> classificationResult = new ArrayList<>();
+                            if (runClassification) {
+                                if (poseClassifierProcessor == null) {
 
-    if (noOfTrains == trainingReps){
-      ToneGenerator tg = new ToneGenerator(AudioManager.AUDIOFOCUS_REQUEST_GRANTED, 100);
-      tg.startTone(ToneGenerator.TONE_CDMA_ABBR_INTERCEPT);
-
-      detector.close();
-      goToTimerActivity();
+                                    ///passing name to handle each training separately
+                                    poseClassifierProcessor = new PoseClassifierProcessor(context, isStreamMode, trainingName);
+                                }
+                                classificationResult = poseClassifierProcessor.getPoseResult(pose);
+                            }
+                            return new PoseWithClassification(pose, classificationResult);
+                        });
     }
 
-//    result.get(1) confidance for the current training
-    //---------------
-    graphicOverlay.add(
-        new PoseGraphic(
-            graphicOverlay,
-            poseWithClassification.pose,
-            showInFrameLikelihood,
-            visualizeZ,
-            rescaleZForVisualization,
-            poseWithClassification.classificationResult));
-  }
+    @Override
+    protected Task<PoseWithClassification> detectInImage(MlImage image) {
+        return detector
+                .process(image)
+                .continueWith(
+                        classificationExecutor,
+                        task -> {
+                            Pose pose = task.getResult();
+                            List<String> classificationResult = new ArrayList<>();
+                            if (runClassification) {
+                                if (poseClassifierProcessor == null) {
+                                    poseClassifierProcessor = new PoseClassifierProcessor(context, isStreamMode, trainingName);
+                                }
+                                classificationResult = poseClassifierProcessor.getPoseResult(pose);
+                            }
+                            return new PoseWithClassification(pose, classificationResult);
+                        });
+    }
 
-  @Override
-  protected void onFailure(@NonNull Exception e) {
-    Log.e(TAG, "Pose detection failed!", e);
-  }
+    @Override
+    protected void onSuccess(
+            @NonNull PoseWithClassification poseWithClassification,
+            @NonNull GraphicOverlay graphicOverlay) {
 
-  @Override
-  protected boolean isMlImageEnabled(Context context) {
-    // Use MlImage in Pose Detection by default, change it to OFF to switch to InputImage.
-    return true;
-  }
+        List<String> result = poseWithClassification.classificationResult;
 
-  private void goToTimerActivity(){
+        if (!result.isEmpty())
+            ((TextView) activity.findViewById(R.id.tx_v_vision_live)).setText(result.get(0));
 
-    currentTakenTime = (int)(System.currentTimeMillis() - startTime)/1000;
+        int noOfTrains = 0;
 
-    Intent intent = new Intent(activity, TimerActivity.class);
-    intent.putExtra("TName", trainingName);
-    intent.putExtra("TReps", trainingReps);
-    intent.putExtra("TSets", trainingSets);
-    intent.putExtra("setNumber", ++trainingSetNumber);
-    intent.putExtra("lastTime", currentTakenTime + lastTime);
-    activity.startActivity(intent);
-    activity.finish();
-  }
+        if (!result.get(0).isEmpty()) {
+            try {
+                noOfTrains = Integer.parseInt(result.get(0).substring(result.get(0).indexOf(':') + 2,
+                        result.get(0).indexOf("reps") - 1));
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage());
+            }
+        }
+
+
+        if (noOfTrains == trainingReps) {
+            ToneGenerator tg = new ToneGenerator(AudioManager.AUDIOFOCUS_REQUEST_GRANTED, 100);
+            tg.startTone(ToneGenerator.TONE_CDMA_ABBR_INTERCEPT);
+            goToTimerActivity();
+        }
+
+//    result.get(1) confidence for the current training
+        //---------------
+        graphicOverlay.add(
+                new PoseGraphic(
+                        graphicOverlay,
+                        poseWithClassification.pose,
+                        showInFrameLikelihood,
+                        visualizeZ,
+                        rescaleZForVisualization,
+                        poseWithClassification.classificationResult));
+    }
+
+    @Override
+    protected void onFailure(@NonNull Exception e) {
+        Log.e(TAG, "Pose detection failed!", e);
+    }
+
+    @Override
+    protected boolean isMlImageEnabled(Context context) {
+        // Use MlImage in Pose Detection by default, change it to OFF to switch to InputImage.
+        return true;
+    }
+
+    private void goToTimerActivity() {
+
+        currentTakenTime = (int) (System.currentTimeMillis() - startTime) / 1000;
+
+        Intent intent = new Intent(activity, TimerActivity.class);
+        intent.putExtra("TName", trainingName);
+        intent.putExtra("TReps", trainingReps);
+        intent.putExtra("TSets", trainingSets);
+        intent.putExtra("setNumber", ++trainingSetNumber);
+        intent.putExtra("lastTime", currentTakenTime + lastTime);
+        activity.startActivity(intent);
+        activity.finish();
+    }
 
 }

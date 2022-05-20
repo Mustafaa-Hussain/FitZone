@@ -1,7 +1,9 @@
 package com.example.fitzone.recycleViewAdapters;
 
 import android.content.Context;
+
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +27,9 @@ public class RecycleViewAdapterForProgram extends RecyclerView.Adapter<RecycleVi
 
     // data is passed into the constructor
     public RecycleViewAdapterForProgram(Context context, JSONArray arrayOfPrograms) {
+        if (context == null)
+            return;
+
         this.mInflater = LayoutInflater.from(context);
         this.myPrograms = arrayOfPrograms;
         this.context = context;
@@ -46,9 +51,9 @@ public class RecycleViewAdapterForProgram extends RecyclerView.Adapter<RecycleVi
             holder.programNo.setText(training.getString("TReps") + " X " + training.getString("TSets"));
 
             //check and assign image to each training
-            if(training.getString("TName").equals(context.getString(R.string.squat)))
+            if (training.getString("TName").equals(context.getString(R.string.squat)))
                 holder.programImage.setImageResource(R.drawable.static_squat);
-            else if(training.getString("TName").equals(context.getString(R.string.push_ups)))
+            else if (training.getString("TName").equals(context.getString(R.string.push_ups)))
                 holder.programImage.setImageResource(R.drawable.static_pushups);
             else
                 holder.programImage.setImageResource(R.drawable.blank_training);
@@ -88,6 +93,7 @@ public class RecycleViewAdapterForProgram extends RecyclerView.Adapter<RecycleVi
                 mClickListener.onItemClick(view, getAdapterPosition());
         }
     }
+
     // convenience method for getting data at click position
     public JSONObject getItem(int id) throws JSONException {
         return (JSONObject) myPrograms.get(id);

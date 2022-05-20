@@ -1,7 +1,9 @@
 package com.example.fitzone.recycleViewAdapters;
 
 import android.content.Context;
+
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +26,9 @@ public class RecycleViewAdapterForDaysPrograms extends RecyclerView.Adapter<Recy
 
     // data is passed into the constructor
     public RecycleViewAdapterForDaysPrograms(Context context, JSONArray arrayOfDays) {
+        if (context == null)
+            return;
+
         this.mInflater = LayoutInflater.from(context);
         this.mData = arrayOfDays;
         this.context = context;
@@ -79,9 +84,10 @@ public class RecycleViewAdapterForDaysPrograms extends RecyclerView.Adapter<Recy
                 mClickListener.onItemClick(view, getAdapterPosition());
         }
     }
+
     // convenience method for getting data at click position
     JSONObject getItem(int id) throws JSONException {
-        return (JSONObject)mData.get(id);
+        return (JSONObject) mData.get(id);
     }
 
     // allows clicks events to be caught

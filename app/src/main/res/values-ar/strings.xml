@@ -25,8 +25,6 @@
     <string name="pref_screen_title_camerax_live_preview" translatable="false">CameraX live preview settings</string>
     <string name="pref_screen_title_cameraxsource_demo" translatable="false">CameraXSource live preview settings</string>
     <string name="pref_category_info" translatable="false">Detection Info</string>
-    <string name="pref_category_pose_detection">Pose Detection</string>
-    <string name="pref_category_segmentation" translatable="false">Selfie Segmentation</string>
 
     <!-- Strings for camera settings. -->
     <string name="pref_category_key_camera" translatable="false">pckc</string>
@@ -225,5 +223,9 @@
     <string name="times">"عدات"</string>
     <string name="push_ups">ضغط</string>
     <string name="squat">قرفصاء</string>
-
+    <string name="badges">الجوائز</string>
+    <string name="pause">ايقاف</string>
+    <string name="admin_panel">لوحة الادارة</string>
+    <string name="in">في</string>
+    <string name="seconds">ثواني</string>
 </resources>

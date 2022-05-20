@@ -1,5 +1,6 @@
 package com.example.fitzone.handelers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,10 +14,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class HandlePost {
-    Context context;
+    Activity activity;
     JSONObject data;
-    public HandlePost(Context context){
-        this.context = context;
+    public HandlePost(Activity activity){
+        this.activity = activity;
     }
 
     public void setPostData(JSONObject data){
@@ -44,12 +45,12 @@ public class HandlePost {
 //        Toast.makeText(context, ((Button)view).getHint(), Toast.LENGTH_SHORT).show();
 
         if(((Button)view).getHint().toString().equals("true")){
-            ((Button)view).setBackground(context.getResources().getDrawable(R.drawable.dislike_button));
+            ((Button)view).setBackground(activity.getResources().getDrawable(R.drawable.dislike_button));
             ((Button)view).setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.min_one, 0);
             ((Button)view).setHint("false");
         }
         else{
-            ((Button)view).setBackground(context.getResources().getDrawable(R.drawable.like_button));
+            ((Button)view).setBackground(activity.getResources().getDrawable(R.drawable.like_button));
             ((Button)view).setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.plus_one, 0);
             ((Button)view).setHint("true");
         }
@@ -57,12 +58,12 @@ public class HandlePost {
 
     public void likeOrDislike(String postID){
 
-        SharedPreferences apiTokenFile = context.getSharedPreferences("UserData", context.MODE_PRIVATE);
+        SharedPreferences apiTokenFile = activity.getSharedPreferences("UserData", Context.MODE_PRIVATE);
         String apiToken = apiTokenFile.getString("apiToken", null);
 
-        HandleRequests handleRequests = new HandleRequests(context);
+        HandleRequests handleRequests = new HandleRequests(activity);
 
-        SharedPreferences postsFile = context.getSharedPreferences("posts", context.MODE_PRIVATE);
+        SharedPreferences postsFile = activity.getSharedPreferences("posts", Context.MODE_PRIVATE);
 
         try {
             JSONObject jsonObject = new JSONObject(postsFile.getString("allPosts", null));
@@ -80,7 +81,7 @@ public class HandlePost {
                                 public void onResponse(boolean status, JSONObject jsonObject) {
                                     Intent intent;
                                     if(status){
-                                        SharedPreferences posts = context.getSharedPreferences("posts", context.MODE_PRIVATE);
+                                        SharedPreferences posts = activity.getSharedPreferences("posts", Context.MODE_PRIVATE);
                                         SharedPreferences.Editor editor = posts.edit();
                                         editor.putString("allPosts", jsonObject.toString());
                                         editor.commit();
@@ -102,7 +103,7 @@ public class HandlePost {
                                 public void onResponse(boolean status, JSONObject jsonObject) {
                                     Intent intent;
                                     if(status){
-                                        SharedPreferences posts = context.getSharedPreferences("posts", context.MODE_PRIVATE);
+                                        SharedPreferences posts = activity.getSharedPreferences("posts", Context.MODE_PRIVATE);
                                         SharedPreferences.Editor editor = posts.edit();
                                         editor.putString("allPosts", jsonObject.toString());
                                         editor.commit();
@@ -114,27 +115,24 @@ public class HandlePost {
                 });
             }
 
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void updatePost(){
-        SharedPreferences apiTokenFile = context.getSharedPreferences("UserData", context.MODE_PRIVATE);
+        SharedPreferences apiTokenFile = activity.getSharedPreferences("UserData", Context.MODE_PRIVATE);
         String apiToken = apiTokenFile.getString("apiToken", null);
 
-        HandleRequests handleRequests = new HandleRequests(context);
+        HandleRequests handleRequests = new HandleRequests(activity);
 
-        handleRequests.getPosts(apiToken, new HandleRequests.VolleyResponseListener() {
-            @Override
-            public void onResponse(boolean status, JSONObject jsonObject) {
-                Intent intent;
-                if(status){
-                    SharedPreferences posts = context.getSharedPreferences("posts", context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = posts.edit();
-                    editor.putString("allPosts", jsonObject.toString());
-                    editor.commit();
-                }
+        handleRequests.getPosts(apiToken, (status, jsonObject) -> {
+
+            if(status){
+                SharedPreferences posts = activity.getSharedPreferences("posts", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = posts.edit();
+                editor.putString("allPosts", jsonObject.toString());
+                editor.apply();
             }
         });
     }

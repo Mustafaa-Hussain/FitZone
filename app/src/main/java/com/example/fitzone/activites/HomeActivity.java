@@ -1,236 +1,89 @@
 package com.example.fitzone.activites;
 
+import static com.example.fitzone.common_functions.StaticFunctions.getApiToken;
+
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
-import android.widget.TextView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import com.example.fitzone.handelers.HandelCommon;
-import com.example.fitzone.handelers.HandlePost;
-import com.example.fitzone.handelers.HandleRequests;
+public class HomeActivity extends AppCompatActivity {
+    Fragment homeFragment,
+            profileFragment,
+            trainingFragment,
+            trophiesFragment;
 
-import com.example.fitzone.recycleViewAdapters.RecycleViewAdapterForPosts;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+    String apiToken;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+    int role = 0;
 
-public class HomeActivity extends HandelCommon implements RecycleViewAdapterForPosts.ItemClickListener{
-    RecycleViewAdapterForPosts adapter;
-    RecyclerView recyclerView;
-    Button share, cancel;
+    BottomNavigationView bottomNavigationView;
 
-    PopupWindow popupWindow;
-
-    FloatingActionButton addPost;
-
+    @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        String apiToken = getSharedPreferences("UserData", MODE_PRIVATE).getString("apiToken", null);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
 
-        addPost = findViewById(R.id.add_post_fab);
-        addPost.setOnClickListener(new View.OnClickListener() {
+        Intent intent = getIntent();
+        role = intent.getIntExtra("role", 0);
 
-                    @Override
-                    public void onClick(View view) {
+        apiToken = getApiToken(this);
 
-                        //handle adding new post
+        homeFragment = new HomeFragment();
+        profileFragment = new ProfileFragment();
+        trainingFragment = new TrainingFragment();
 
-                        // inflate the layout of the popup window
-                        LayoutInflater inflater = (LayoutInflater)
-                                getSystemService(LAYOUT_INFLATER_SERVICE);
-                        View popupView = inflater.inflate(R.layout.add_post, null);
+        trophiesFragment = new TrophiesFragment();
 
-                        // create the popup window
-                        int width = LinearLayout.LayoutParams.MATCH_PARENT;
-                        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-                        boolean focusable = true; // lets taps outside the popup also dismiss it
-                        popupWindow = new PopupWindow(popupView, width, height, true);
 
-                        // show the popup window
-                        // which view you pass in doesn't matter, it is only used for the window token
-                        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+        setFragmentContent(homeFragment);
 
-                        share = popupView.findViewById(R.id.sharePost);
-                        share.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
+        bottomNavigationView.setSelectedItemId(R.id.home);
+        bottomNavigationView.setOnItemSelectedListener(v -> {
+            switch (v.getItemId()) {
+                case R.id.home:
+                    setFragmentContent(homeFragment);
+                    break;
+                case R.id.profile:
+                    setFragmentContent(profileFragment);
+                    break;
+                case R.id.training:
+                    setFragmentContent(trainingFragment);
+                    break;
+                case R.id.badges:
+                    setFragmentContent(trophiesFragment);
+                    break;
+            }
+            return true;
+        });
 
-                                TextView caption, content;
-                                caption = popupView.findViewById(R.id.caption);
-                                content = popupView.findViewById(R.id.content);
-
-                                if(!caption.getText().equals("") && !content.getText().equals("")){
-
-                                    int postType = 0;
-                                    HandleRequests handleRequests = new HandleRequests(HomeActivity.this);
-                                    handleRequests.addPost(caption.getText().toString(), content.getText().toString(), postType,apiToken,
-                                            new HandleRequests.VolleyResponseListener() {
-                                                @Override
-                                                public void onResponse(boolean status, JSONObject jsonObject) {
-                                                    if (status) {
-                                                        Snackbar.make(view, "post shared successfully", Snackbar.LENGTH_LONG)
-                                                                .setAction("Action", null).show();
-
-                                                        Intent intent;
-                                                        intent = new Intent(HomeActivity.this, HomeActivity.class);
-                                                        startActivity(intent);
-
-                                                        popupWindow.dismiss();
-                                                    }
-                                                    else {
-                                                        Snackbar.make(view, "something wrong with your internet connection", Snackbar.LENGTH_LONG)
-                                                                .setAction("Action", null).show();
-                                                    }
-                                                }
-                                            });
-                                }
-                                else{
-                                    Snackbar.make(view, "must fill all fields", Snackbar.LENGTH_LONG)
-                                            .setAction("Action", null).show();
-                                }
-
-                            }
-                        });
-
-                        cancel = popupView.findViewById(R.id.cancelPopUp);
-                        cancel.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Snackbar.make(view, "cancel post", Snackbar.LENGTH_LONG)
-                                        .setAction("Action", null).show();
-
-                                popupWindow.dismiss();
-                            }
-                        });
-
-                        // dismiss the popup window when touched
-                        popupView.setOnTouchListener(new View.OnTouchListener() {
-
-                            @Override
-                            public boolean onTouch(View v, MotionEvent event) {
-//                                popupWindow.dismiss();
-                                return true;
-                            }
-                        });
-                    }});
-
-        //request and display posts
-        HandleRequests handleRequests = new HandleRequests(HomeActivity.this);
-        handleRequests.getPosts(apiToken, new HandleRequests.VolleyResponseListener() {
-            @Override
-            public void onResponse(boolean status, JSONObject jsonObject) {
-                if(status){
-                    recyclerView = findViewById(R.id.recycleView);
-
-                    try {
-                        int [] colors ={
-                                getResources().getColor(R.color.regular_post_gray),
-                                getResources().getColor(R.color.achievement_post_yellow),
-                                getResources().getColor(R.color.image_post),
-                                getResources().getColor(R.color.video_post)
-                        };
-                        adapter = new RecycleViewAdapterForPosts(HomeActivity.this, jsonObject.getJSONArray("posts"), colors);
-                        adapter.setClickListener(HomeActivity.this);
-                        recyclerView.setHasFixedSize(true);
-                        recyclerView.setAdapter(adapter);
-                        recyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
+        bottomNavigationView.setOnItemReselectedListener(v -> {
+            switch (v.getItemId()) {
+                case R.id.home:
+                    setFragmentContent(homeFragment);
+                    break;
+                case R.id.profile:
+                    setFragmentContent(profileFragment);
+                    break;
+                case R.id.training:
+                    setFragmentContent(trainingFragment);
+                    break;
+                case R.id.badges:
+                    setFragmentContent(trophiesFragment);
+                    break;
             }
         });
     }
 
-    @Override
-    public void onItemClick(View view, int position) {
-        try {
-            //Toast.makeText(this, "id: " + adapter.getItem(position).getString("id"), Toast.LENGTH_SHORT).show();
-            if(view.getId() == R.id.like){
-                //handle like button
-                String postID = adapter.getItem(position).getString("id");
-                HandlePost handlePost = new HandlePost(HomeActivity.this);
-                //send request
-                handlePost.likeOrDislike(postID);
-                handlePost.setLikeButtonState(view, postID);
-                handlePost.updatePost();
-
-                int noOfLikesInt = Integer.parseInt(adapter.getItem(position).getString("number_of_likes"));
-
-                RecyclerView.ViewHolder rv_view = recyclerView.findViewHolderForAdapterPosition(position);
-                TextView noOfLikes = rv_view.itemView.findViewById(R.id.noOfLikes);
-
-                if(((Button)view.findViewById(R.id.like)).getHint().equals("true"))
-                    adapter.getItem(position).put("number_of_likes", --noOfLikesInt);
-                else
-                    adapter.getItem(position).put("number_of_likes", ++noOfLikesInt);
-
-                noOfLikes.setText(adapter.getItem(position).getString("number_of_likes"));
-
-                //update no. of likes and no. of comments
-
-            }
-            else if(view.getId() == R.id.comment){
-                //handle comment
-                Intent intent;
-                intent = new Intent(HomeActivity.this, Comments.class);
-                intent.putExtra("post_id", adapter.getItem(position).getString("id"));
-                startActivity(intent);
-                //finish();
-            }
-            else if(view.getId() == R.id.more){
-                PopupWindow askPopup;
-
-                // inflate the layout of the popup window
-                LayoutInflater inflater = (LayoutInflater)
-
-                        getSystemService(LAYOUT_INFLATER_SERVICE);
-                View popupView = inflater.inflate(R.layout.ask_if_yes_or_no, null);
-
-                // create the popup window
-                int width = LinearLayout.LayoutParams.MATCH_PARENT;
-                int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-                boolean focusable = true; // lets taps outside the popup also dismiss it
-                askPopup = new PopupWindow(popupView, width, height, true);
-
-
-                //put the message
-                ((TextView)popupView.findViewById(R.id.messageQ)).setText(R.string.more_mesage);
-
-
-                // show the popup window
-                // which view you pass in doesn't matter, it is only used for the window token
-                askPopup.showAtLocation(view, Gravity.CENTER, 0, 0);
-
-                ((LinearLayout)popupView.findViewById(R.id.yes_no_buttons)).setVisibility(View.GONE);
-                //get info about user that post this post
-
-                // dismiss the popup window when touched
-                popupView.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        askPopup.dismiss();
-                        return true;
-                    }
-                });
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    private void setFragmentContent(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fl_home_activity, fragment).commit();
     }
 }

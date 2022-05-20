@@ -1,11 +1,16 @@
 package com.example.fitzone.recycleViewAdapters;
 
+import static com.example.fitzone.common_functions.StaticFunctions.getHostUrl;
+
+import android.app.Activity;
 import android.content.Context;
 
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.net.Uri;
+import android.util.Log;
+import android.util.Printer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +19,10 @@ import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.bumptech.glide.Glide;
 import com.example.fitzone.activites.R;
 import com.example.fitzone.handelers.HandlePost;
 
@@ -28,17 +35,26 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
     private JSONArray mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
-    HandlePost handlePost;
-    Context context;
+    private HandlePost handlePost;
+    private Activity activity;
 
-    int[] colors;
+    Integer[] colors;
 
     // data is passed into the constructor
-    public RecycleViewAdapterForPosts(Context context, JSONArray arrayOfPosts, int [] colors) {
-        this.mInflater = LayoutInflater.from(context);
+    public RecycleViewAdapterForPosts(Activity activity, JSONArray arrayOfPosts) {
+        if (activity == null)
+            return;
+
+        this.mInflater = LayoutInflater.from(activity);
         this.mData = arrayOfPosts;
-        this.context = context;
-        this.colors = colors;
+        this.activity = activity;
+
+        this.colors = new Integer[]{
+                activity.getResources().getColor(R.color.regular_post_gray),
+                activity.getResources().getColor(R.color.achievement_post_yellow),
+                activity.getResources().getColor(R.color.image_post),
+                activity.getResources().getColor(R.color.video_post)
+        };
     }
 
     // inflates the row layout from xml when needed
@@ -70,11 +86,19 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
         try {
             JSONObject post = mData.getJSONObject(position);
 
-            switch (getItemViewType(position)){
+            switch (getItemViewType(position)) {
                 case 0://this case for basic post
-                    ViewHolderBasic viewHolderBasic = (ViewHolderBasic)holder;
+                    ViewHolderBasic viewHolderBasic = (ViewHolderBasic) holder;
                     viewHolderBasic.username.setText(post.getString("username"));
-//            viewHolderBasic.userAvatar.setImage//;
+
+                    //fill avatar image
+                    Glide.with(activity)
+                            .load(getHostUrl(activity) + post.getString("user_avatar"))
+                            .centerCrop()
+                            .circleCrop()
+                            .placeholder(R.drawable.loading_spinner)
+                            .into(viewHolderBasic.profileImage);
+
                     viewHolderBasic.initDate.setText(post.getString("created_at").substring(0, post.getString("created_at").indexOf('T')));
                     viewHolderBasic.caption.setText(post.getString("caption"));
                     viewHolderBasic.content.setText(post.getString("content"));
@@ -85,16 +109,24 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
                     //to handle post by it's id
                     viewHolderBasic.like.setHint(post.getString("liked"));
 
-                    handlePost = new HandlePost(context);
+                    handlePost = new HandlePost(activity);
                     handlePost.setPostData(post);
 
-                    handlePost.setLikeButtonState(viewHolderBasic.like,post.getString("id"));
+                    handlePost.setLikeButtonState(viewHolderBasic.like, post.getString("id"));
 
                     break;
                 case 1://this case for rating post
                     ViewHolderRating viewHolderRating = (ViewHolderRating) holder;
                     viewHolderRating.username.setText(post.getString("username"));
-//            viewHolderRating.userAvatar.setImage//;
+
+                    //fill avatar image
+                    Glide.with(activity)
+                            .load(getHostUrl(activity) + post.getString("user_avatar"))
+                            .centerCrop()
+                            .circleCrop()
+                            .placeholder(R.drawable.loading_spinner)
+                            .into(viewHolderRating.profileImage);
+
                     viewHolderRating.initDate.setText(post.getString("created_at").substring(0, post.getString("created_at").indexOf('T')));
                     viewHolderRating.caption.setText(post.getString("caption"));
                     viewHolderRating.content.setText(post.getString("content"));
@@ -105,16 +137,24 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
                     //to handle post by it's id
                     viewHolderRating.like.setHint(post.getString("liked"));
 
-                    handlePost = new HandlePost(context);
+                    handlePost = new HandlePost(activity);
                     handlePost.setPostData(post);
 
-                    handlePost.setLikeButtonState(viewHolderRating.like,post.getString("id"));
+                    handlePost.setLikeButtonState(viewHolderRating.like, post.getString("id"));
 
                     break;
                 case 2://this case for image post
                     ViewHolderImage viewHolderImage = (ViewHolderImage) holder;
                     viewHolderImage.username.setText(post.getString("username"));
-//            viewHolderImage.userAvatar.setImage//;
+
+                    //fill avatar image
+                    Glide.with(activity)
+                            .load(getHostUrl(activity) + post.getString("user_avatar"))
+                            .centerCrop()
+                            .circleCrop()
+                            .placeholder(R.drawable.loading_spinner)
+                            .into(viewHolderImage.profileImage);
+
                     viewHolderImage.initDate.setText(post.getString("created_at").substring(0, post.getString("created_at").indexOf('T')));
                     viewHolderImage.caption.setText(post.getString("caption"));
                     viewHolderImage.content.setText(post.getString("content"));
@@ -125,16 +165,24 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
                     //to handle post by it's id
                     viewHolderImage.like.setHint(post.getString("liked"));
 
-                    handlePost = new HandlePost(context);
+                    handlePost = new HandlePost(activity);
                     handlePost.setPostData(post);
 
-                    handlePost.setLikeButtonState(viewHolderImage.like,post.getString("id"));
+                    handlePost.setLikeButtonState(viewHolderImage.like, post.getString("id"));
 
                     break;
                 case 3://this case for video post
                     ViewHolderVideo viewHolderVideo = (ViewHolderVideo) holder;
                     viewHolderVideo.username.setText(post.getString("username"));
-//            viewHolderVideo.userAvatar.setImage//;
+
+                    //fill avatar image
+                    Glide.with(activity)
+                            .load(getHostUrl(activity) + post.getString("user_avatar"))
+                            .centerCrop()
+                            .circleCrop()
+                            .placeholder(R.drawable.loading_spinner)
+                            .into(viewHolderVideo.profileImage);
+
                     viewHolderVideo.initDate.setText(post.getString("created_at").substring(0, post.getString("created_at").indexOf('T')));
                     viewHolderVideo.caption.setText(post.getString("caption"));
                     viewHolderVideo.content.setText(post.getString("content"));
@@ -145,19 +193,20 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
                     //to handle post by it's id
                     viewHolderVideo.like.setHint(post.getString("liked"));
 
-                    handlePost = new HandlePost(context);
+                    handlePost = new HandlePost(activity);
                     handlePost.setPostData(post);
 
-                    handlePost.setLikeButtonState(viewHolderVideo.like,post.getString("id"));
+                    handlePost.setLikeButtonState(viewHolderVideo.like, post.getString("id"));
 
                     //set video to video view
                     //this path for test only or for default video
-                    String videoPath = "android.resource://"+ context.getPackageName() + "/" + R.raw.push_ups_with_music;
+                    String videoPath = "android.resource://" + activity.getPackageName() + "/" + R.raw.push_ups_with_music;
 //                    videoPath = "http://" + "192.168.1.2" + ':' + "8000" + "";
                     Uri uri = Uri.parse(videoPath);
                     viewHolderVideo.postVideo.setVideoURI(uri);
-                    MediaController mediaController = new MediaController(context);
+                    MediaController mediaController = new MediaController(activity);
                     viewHolderVideo.postVideo.setMediaController(mediaController);
+
                     mediaController.setAnchorView(viewHolderVideo.postVideo);
 
                     break;
@@ -353,7 +402,7 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
 
     // convenience method for getting data at click position
     public JSONObject getItem(int id) throws JSONException {
-        return (JSONObject)mData.get(id);
+        return (JSONObject) mData.get(id);
     }
 
     // allows clicks events to be caught

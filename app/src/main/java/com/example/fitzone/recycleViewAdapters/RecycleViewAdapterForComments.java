@@ -23,6 +23,9 @@ public class RecycleViewAdapterForComments extends RecyclerView.Adapter<RecycleV
 
     // data is passed into the constructor
     public RecycleViewAdapterForComments(Context context, JSONArray arrayOfPosts) {
+        if (context == null)
+            return;
+
         this.mInflater = LayoutInflater.from(context);
         this.mData = arrayOfPosts;
         this.context = context;
@@ -60,14 +63,10 @@ public class RecycleViewAdapterForComments extends RecyclerView.Adapter<RecycleV
     public class ViewHolder extends RecyclerView.ViewHolder{
         TextView username,
                 initDate,
-                caption,
-                content,
-                noOfLikes,
-                noOfComments;
+                content;
 
         ImageView userAvatar;
 
-        Button comment, like;
 
         ViewHolder(View itemView) {
             super(itemView);

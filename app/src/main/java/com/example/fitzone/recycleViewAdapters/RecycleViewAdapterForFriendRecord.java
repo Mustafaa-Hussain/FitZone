@@ -22,6 +22,9 @@ public class RecycleViewAdapterForFriendRecord extends RecyclerView.Adapter<Recy
 
     // data is passed into the constructor
     public RecycleViewAdapterForFriendRecord(Context context, JSONArray arrayOfPosts) {
+        if (context == null)
+            return;
+
         this.mInflater = LayoutInflater.from(context);
         this.mData = arrayOfPosts;
         this.context = context;

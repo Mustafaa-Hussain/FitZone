@@ -3,6 +3,8 @@ package com.example.fitzone.activites;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,7 +17,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 
-import com.example.fitzone.handelers.HandelCommon;
 import com.example.fitzone.handelers.HandleRequests;
 
 import com.example.fitzone.recycleViewAdapters.RecycleViewAdapterForComments;
@@ -26,7 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Comments extends HandelCommon {
+public class Comments extends AppCompatActivity {
 
     RecycleViewAdapterForComments adapter;
     RecyclerView recyclerView;

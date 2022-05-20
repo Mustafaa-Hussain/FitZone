@@ -3,8 +3,8 @@ package com.example.fitzone.activites;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
-import android.net.IpSecManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
@@ -15,7 +15,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.example.fitzone.handelers.HandleRequests;
 import com.google.android.material.snackbar.Snackbar;
@@ -36,20 +36,24 @@ public class TimerActivity extends AppCompatActivity {
 
     Button yes, no;
 
+    ToggleButton toggleButton;
+
     Handler timerHandler = new Handler();
     Runnable timerRunnable = null;
+
     //timer that take a time and wait for it
-    private void waitTime(int limit){
+    private void waitTime(int limit) {
         timerRunnable = new Runnable() {
             int seconds;
             final long startTime = System.currentTimeMillis();
+
             @SuppressLint("DefaultLocale")
             @Override
             public void run() {
                 long millis = System.currentTimeMillis() - startTime;
                 seconds = (int) (millis / 1000);
 
-                if(seconds >= limit) {
+                if (seconds >= limit) {
                     timerHandler.removeCallbacks(this);
                     goToLivePreviewActivity();
                     return;
@@ -63,7 +67,7 @@ public class TimerActivity extends AppCompatActivity {
         timerHandler.postDelayed(timerRunnable, 0);
     }
 
-    private void goToLivePreviewActivity(){
+    private void goToLivePreviewActivity() {
         Intent intent = new Intent(getApplicationContext(), LivePreviewActivity.class);
         intent.putExtra("TName", trainingName);
         intent.putExtra("TReps", trainingReps);
@@ -74,34 +78,52 @@ public class TimerActivity extends AppCompatActivity {
         finish();
     }
 
+
     @SuppressLint({"SetTextI18n", "DefaultLocale"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timer);
 
+        TextView trainingData = findViewById(R.id.training_name);
+
         timerTextView = findViewById(R.id.timer);
+
+        toggleButton = findViewById(R.id.timer_toggle_button);
+        toggleButton.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            if (isChecked) {
+                timerHandler.removeCallbacks(timerRunnable);
+            } else {
+                timerHandler.postDelayed(timerRunnable, 0);
+            }
+        });
 
         Intent intent = getIntent();
         trainingName = intent.getStringExtra("TName");
-        trainingReps = intent.getIntExtra("TReps", 1);
-        trainingSets = intent.getIntExtra("TSets", 1);
+        trainingReps = intent.getIntExtra("TReps", 10);
+        trainingSets = intent.getIntExtra("TSets", 3);
         trainingSetNumber = intent.getIntExtra("setNumber", 1);
         lastTime = intent.getIntExtra("lastTime", 0);//for store last set taken time
 
-        if(trainingSetNumber > 1) {
-            if(trainingSetNumber > trainingSets){
+        if (trainingSetNumber > 1) {
+            if (trainingSetNumber > trainingSets) {
                 timerHandler.removeCallbacks(timerRunnable);
                 timerTextView.setTextSize(20);
+                trainingData.setText(trainingName);
+                toggleButton.setVisibility(View.GONE);
                 timerTextView.setText(String.format("%s \n %d X %d in %d seconds.", trainingName, trainingReps, trainingSets, lastTime));
-//            askToShareOrNot(trainingName, String.format("%d X %d in %d seconds.", trainingReps, trainingSets, lastTime), timerTextView);
-            }
-            else{
-                waitTime(30);//wait 10 seconds then move to @link{LivePreviewActivity}
+
+                //TODO send completed data to server
+
+//                askToShareOrNot(trainingName,
+//                        String.format("%d X %d " + getString(R.string.in) + " %d " + getString(R.string.seconds), trainingReps, trainingSets, lastTime),
+//                        findViewById(R.id.timer_main_view));
+
+            } else {
+                waitTime(30);//wait 30 seconds then move to @link{LivePreviewActivity}
             }
 
-        }
-        else {
+        } else {
             waitTime(15);
         }
 
@@ -112,16 +134,14 @@ public class TimerActivity extends AppCompatActivity {
                 trainingReps,
                 getResources().getString(R.string.times));
 
-        TextView trainingData = findViewById(R.id.training_name);
-
         trainingData.setText(trainingName + "\n" + trainData);
 
         GifImageView gifImageView = findViewById(R.id.training_gif_file);
 
         //check and assign image to each training
-        if(trainingData.equals(getString(R.string.squat)))
+        if (trainingName.equals(getString(R.string.squat)))
             gifImageView.setImageResource(R.drawable.dynamic_squat);
-        else if(trainingData.equals(getString(R.string.push_ups)))
+        else if (trainingName.equals(getString(R.string.push_ups)))
             gifImageView.setImageResource(R.drawable.dynamic_push_ups);
         else
             gifImageView.setImageResource(R.drawable.dynamic_squat);
@@ -130,14 +150,13 @@ public class TimerActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-        if(timerRunnable != null)
+        if (timerRunnable != null)
             timerHandler.removeCallbacks(timerRunnable);
         finish();
     }
 
-
     //share results after finishes
-    public void askToShareOrNot(String caption, String content, View view){
+    public void askToShareOrNot(String caption, String content, View view) {
 
         PopupWindow askPopup;
 
@@ -153,7 +172,7 @@ public class TimerActivity extends AppCompatActivity {
         askPopup = new PopupWindow(popupView, width, height, true);
 
         //put the message
-        ((TextView)popupView.findViewById(R.id.messageQ)).setText(getResources().getString(R.string.share_mesege) + content + " ?");
+        ((TextView) popupView.findViewById(R.id.messageQ)).setText(getResources().getString(R.string.share_mesege) + content + " ?");
 
         // show the popup window
         // which view you pass in doesn't matter, it is only used for the window token
@@ -169,23 +188,22 @@ public class TimerActivity extends AppCompatActivity {
 
                 int postType = 1;//for training not regular post
                 handleRequests.addPost(caption, content, postType, apiToken,
-                    new HandleRequests.VolleyResponseListener() {
-                        @Override
-                        public void onResponse(boolean status, JSONObject jsonObject) {
-                            if (status) {
-                                Intent intent;
-                                intent = new Intent(TimerActivity.this, DayActivity.class);
-                                intent.putExtra("day", caption);
-                                startActivity(intent);
+                        new HandleRequests.VolleyResponseListener() {
+                            @Override
+                            public void onResponse(boolean status, JSONObject jsonObject) {
+                                if (status) {
+                                    Intent intent;
+                                    intent = new Intent(TimerActivity.this, DayActivity.class);
+                                    intent.putExtra("day", caption);
+                                    startActivity(intent);
 
-                                askPopup.dismiss();
+                                    askPopup.dismiss();
+                                } else {
+                                    Snackbar.make(view, "something wrong with your internet connection", Snackbar.LENGTH_LONG)
+                                            .setAction("Action", null).show();
+                                }
                             }
-                            else {
-                                Snackbar.make(view, "something wrong with your internet connection", Snackbar.LENGTH_LONG)
-                                        .setAction("Action", null).show();
-                            }
-                        }
-                    });
+                        });
             }
         });
 
@@ -211,5 +229,4 @@ public class TimerActivity extends AppCompatActivity {
             }
         });
     }
-
 }

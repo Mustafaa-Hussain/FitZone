@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -17,10 +16,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.fitzone.handelers.HandelCommon;
 
 import com.example.fitzone.recycleViewAdapters.RecycleViewAdapterForProgram;
 
@@ -28,11 +26,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Timer;
-
 import pl.droidsonroids.gif.GifImageView;
 
-public class DayActivity extends HandelCommon implements RecycleViewAdapterForProgram.ItemClickListener {
+public class DayActivity extends AppCompatActivity implements RecycleViewAdapterForProgram.ItemClickListener {
 
     RecycleViewAdapterForProgram adapter;
     RecyclerView recyclerView;
@@ -55,14 +51,14 @@ public class DayActivity extends HandelCommon implements RecycleViewAdapterForPr
 
         try {
             myDay.put("TName", getString(R.string.push_ups));
-            myDay.put("TReps", 15);
-            myDay.put("TSets", 3);
+            myDay.put("TReps", 2);
+            myDay.put("TSets", 2);
             myTrainings.put(myDay);
 
             myDay = new JSONObject();
             myDay.put("TName", getString(R.string.squat));
-            myDay.put("TReps", 10);
-            myDay.put("TSets", 3);
+            myDay.put("TReps", 2);
+            myDay.put("TSets", 2);
             myTrainings.put(myDay);
 
             myDay = new JSONObject();
@@ -91,7 +87,7 @@ public class DayActivity extends HandelCommon implements RecycleViewAdapterForPr
             PopupWindow startTraining;
 
             // inflate the layout of the popup window
-            LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 
             View popupView = inflater.inflate(R.layout.begining_trining_structure, null);
 
@@ -102,7 +98,7 @@ public class DayActivity extends HandelCommon implements RecycleViewAdapterForPr
             startTraining = new PopupWindow(popupView, width, height, focusable);
 
 
-            try{
+            try {
                 //get json object that hold training data
                 JSONObject object = adapter.getItem(position);
 
@@ -111,9 +107,9 @@ public class DayActivity extends HandelCommon implements RecycleViewAdapterForPr
                 GifImageView gifImageView = popupView.findViewById(R.id.training_gif_file);
 
                 //check and assign image to each training
-                if(object.getString("TName").equals(getString(R.string.squat)))
+                if (object.getString("TName").equals(getString(R.string.squat)))
                     gifImageView.setImageResource(R.drawable.dynamic_squat);
-                else if(object.getString("TName").equals(getString(R.string.push_ups)))
+                else if (object.getString("TName").equals(getString(R.string.push_ups)))
                     gifImageView.setImageResource(R.drawable.dynamic_push_ups);
                 else
                     gifImageView.setImageResource(R.drawable.dynamic_squat);
@@ -121,20 +117,18 @@ public class DayActivity extends HandelCommon implements RecycleViewAdapterForPr
 
                 //put the Day name
                 String trainingName = object.getString("TName");
-                ((TextView)popupView.findViewById(R.id.start_training_name)).setText(trainingName);
+                ((TextView) popupView.findViewById(R.id.start_training_name)).setText(trainingName);
 
                 String TReps = object.getString("TReps"),
                         TSets = object.getString("TSets");
 
                 String noOfTrains = TReps + " X " + TSets;
-                ((TextView)popupView.findViewById(R.id.no)).setText(noOfTrains);
+                ((TextView) popupView.findViewById(R.id.no)).setText(noOfTrains);
 
                 Button begin = popupView.findViewById(R.id.begin);
                 begin.setOnClickListener(
                         v -> {
                             try {
-                                Toast.makeText(DayActivity.this, "beginning " + object.getString("TName"), Toast.LENGTH_SHORT).show();
-
                                 Intent intent;
                                 intent = new Intent(getApplicationContext(), TimerActivity.class);
                                 intent.putExtra("TName", object.getString("TName"));
@@ -146,9 +140,8 @@ public class DayActivity extends HandelCommon implements RecycleViewAdapterForPr
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                });
-            }
-            catch (JSONException e){
+                        });
+            } catch (JSONException e) {
                 System.out.println(e.getMessage());
             }
 
@@ -170,12 +163,10 @@ public class DayActivity extends HandelCommon implements RecycleViewAdapterForPr
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (this.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 this.requestPermissions(new String[]{Manifest.permission.CAMERA}, 1);
-            }
-            else if(this.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED){
+            } else if (this.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                 startActivity(intent);
             }
-        }
-        else{
+        } else {
             startActivity(intent);
         }
     }

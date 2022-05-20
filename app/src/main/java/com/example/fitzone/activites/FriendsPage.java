@@ -12,13 +12,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
 
-import com.example.fitzone.handelers.HandelCommon;
 import com.example.fitzone.handelers.HandleRequests;
 
 import com.example.fitzone.recycleViewAdapters.RecycleViewAdapterForFriendRecord;
@@ -30,7 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class FriendsPage extends HandelCommon implements RecycleViewAdapterForFriendRecord.ItemClickListener{
+public class FriendsPage extends AppCompatActivity implements RecycleViewAdapterForFriendRecord.ItemClickListener {
 
     RecycleViewAdapterForFriendRecord adapter;
     RecyclerView recyclerView;
@@ -46,6 +44,7 @@ public class FriendsPage extends HandelCommon implements RecycleViewAdapterForFr
     TabLayout tabLayout;
 
     PopupWindow popupWindow;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,17 +57,16 @@ public class FriendsPage extends HandelCommon implements RecycleViewAdapterForFr
         handleRequests.getUserProfile(apiToken, new HandleRequests.VolleyResponseListener() {
             @Override
             public void onResponse(boolean status, JSONObject jsonObject) {
-                if (status){
+                if (status) {
                     try {
                         myFriends = jsonObject.getJSONArray("friends_username");
 
                         recyclerView = findViewById(R.id.recycleView);
                         recyclerView.setLayoutManager(new LinearLayoutManager(FriendsPage.this));
 
-                        if(!myFriends.toString().equals("[]")) {
+                        if (!myFriends.toString().equals("[]")) {
                             adapter = new RecycleViewAdapterForFriendRecord(FriendsPage.this, myFriends);
-                        }
-                        else {
+                        } else {
                             Snackbar.make(findViewById(R.id.recycleView), "There is no Friends write now", Snackbar.LENGTH_LONG)
                                     .setAction("Action", null).show();
                         }
@@ -77,8 +75,7 @@ public class FriendsPage extends HandelCommon implements RecycleViewAdapterForFr
                         e.printStackTrace();
                     }
                     recyclerView.setAdapter(adapter);
-                }
-                else {
+                } else {
                     Snackbar.make(findViewById(R.id.recycleView), "Something wrong", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
@@ -86,72 +83,62 @@ public class FriendsPage extends HandelCommon implements RecycleViewAdapterForFr
         });
 
         tabLayout = findViewById(R.id.tl_friends_page);
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
 
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if(tab.getText().equals(getString(R.string.my_friends))){
+                if (tab.getText().equals(getString(R.string.my_friends))) {
                     HandleRequests handleRequests = new HandleRequests(FriendsPage.this);
-                    handleRequests.getUserProfile(apiToken, new HandleRequests.VolleyResponseListener() {
-                        @Override
-                        public void onResponse(boolean status, JSONObject jsonObject) {
-                            if (status){
-                                try {
-                                    myFriends = jsonObject.getJSONArray("friends_username");
+                    handleRequests.getUserProfile(apiToken, (status, jsonObject) -> {
+                        if (status) {
+                            try {
+                                myFriends = jsonObject.getJSONArray("friends_username");
 
-                                    recyclerView = findViewById(R.id.recycleView);
-                                    recyclerView.setLayoutManager(new LinearLayoutManager(FriendsPage.this));
+                                recyclerView = findViewById(R.id.recycleView);
+                                recyclerView.setLayoutManager(new LinearLayoutManager(FriendsPage.this));
 
-                                    if(!myFriends.toString().equals("[]")) {
-                                        adapter = new RecycleViewAdapterForFriendRecord(FriendsPage.this, myFriends);
-                                    }
-                                    else {
-                                        Snackbar.make(findViewById(R.id.recycleView), "There is no Friends write now", Snackbar.LENGTH_LONG)
-                                                .setAction("Action", null).show();
-                                    }
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+                                if (!myFriends.toString().equals("[]")) {
+                                    adapter = new RecycleViewAdapterForFriendRecord(FriendsPage.this, myFriends);
+                                } else {
+                                    //adapter = new RecycleViewAdapterForFriendRecord(FriendsPage.this, null);
+                                    Snackbar.make(findViewById(R.id.recycleView), "There is no Friends write now", Snackbar.LENGTH_LONG)
+                                            .setAction("Action", null).show();
                                 }
-                                recyclerView.setAdapter(adapter);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                            else {
-                                Snackbar.make(findViewById(R.id.recycleView), "Something wrong", Snackbar.LENGTH_LONG)
-                                        .setAction("Action", null).show();
-                            }
+                            recyclerView.setAdapter(adapter);
+                        } else {
+                            Snackbar.make(findViewById(R.id.recycleView), "Something wrong", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
                         }
                     });
-                }
-                else if(tab.getText().equals(getString(R.string.all_users))){
+                } else if (tab.getText().equals(getString(R.string.all_users))) {
 
                     HandleRequests handleRequests = new HandleRequests(FriendsPage.this);
-                    handleRequests.getAllUsers(apiToken, new HandleRequests.VolleyResponseListener() {
-                        @Override
-                        public void onResponse(boolean status, JSONObject jsonObject) {
-                            if (status) {
-                                try {
-                                    myFriends = jsonObject.getJSONArray("users");
+                    handleRequests.getAllUsers(apiToken, (status, jsonObject) -> {
+                        if (status) {
+                            try {
+                                myFriends = jsonObject.getJSONArray("users");
 
-                                    recyclerView = findViewById(R.id.recycleView);
-                                    recyclerView.setLayoutManager(new LinearLayoutManager(FriendsPage.this));
+                                recyclerView = findViewById(R.id.recycleView);
+                                recyclerView.setLayoutManager(new LinearLayoutManager(FriendsPage.this));
 
-                                    if(!myFriends.toString().equals("[]")) {
-                                        adapter = new RecycleViewAdapterForFriendRecord(FriendsPage.this, myFriends);
-                                    }
-                                    else {
-                                        Snackbar.make(findViewById(R.id.recycleView), "There is no Friends write now", Snackbar.LENGTH_LONG)
-                                                .setAction("Action", null).show();
-                                    }
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+                                if (!myFriends.toString().equals("[]")) {
+                                    adapter = new RecycleViewAdapterForFriendRecord(FriendsPage.this, myFriends);
+                                } else {
+                                    Snackbar.make(findViewById(R.id.recycleView), "There is no Friends write now", Snackbar.LENGTH_LONG)
+                                            .setAction("Action", null).show();
                                 }
-                                recyclerView.setAdapter(adapter);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                            else {
-                                Snackbar.make(tabLayout, "There is no user with this name", Snackbar.LENGTH_LONG)
-                                        .setAction("Action", null).show();
-                            }
+                            recyclerView.setAdapter(adapter);
+                        } else {
+                            Snackbar.make(tabLayout, "There is no user with this name", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
                         }
                     });
 
@@ -160,10 +147,9 @@ public class FriendsPage extends HandelCommon implements RecycleViewAdapterForFr
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                if(tab.getId() == R.id.myFriends_t){
+                if (tab.getId() == R.id.myFriends_t) {
 
-                }
-                else if(tab.getId() == R.id.allFriends_t){
+                } else if (tab.getId() == R.id.allFriends_t) {
 
                 }
             }
@@ -204,7 +190,7 @@ public class FriendsPage extends HandelCommon implements RecycleViewAdapterForFr
                         EditText username;
                         username = popupView.findViewById(R.id.searchUsername);
 
-                        if(!username.getText().equals("")){
+                        if (!username.getText().equals("")) {
                             String apiToken = getSharedPreferences("UserData", MODE_PRIVATE).getString("apiToken", null);
 
                             HandleRequests handleRequests = new HandleRequests(FriendsPage.this);
@@ -217,28 +203,26 @@ public class FriendsPage extends HandelCommon implements RecycleViewAdapterForFr
                                                 try {
                                                     String username = jsonObject.getString("username");
                                                     //check if this friend or not
-                                                    for(int i = 0; i < myFriends.length(); i++){
-                                                        if(myFriends.getString(i).equals(username)){
+                                                    for (int i = 0; i < myFriends.length(); i++) {
+                                                        if (myFriends.getString(i).equals(username)) {
                                                             flag = true;
                                                             break;
                                                         }
                                                     }
 
                                                     popupWindow.dismiss();
-                                                    askToAddOrNot(flag, username,view);
+                                                    askToAddOrNot(flag, username, view);
 
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
                                                 }
-                                            }
-                                            else {
+                                            } else {
                                                 Snackbar.make(view, "There is no user with this name", Snackbar.LENGTH_LONG)
                                                         .setAction("Action", null).show();
                                             }
                                         }
                                     });
-                        }
-                        else{
+                        } else {
                             Snackbar.make(view, "must fill all fields", Snackbar.LENGTH_LONG)
                                     .setAction("Action", null).show();
                         }
@@ -266,14 +250,16 @@ public class FriendsPage extends HandelCommon implements RecycleViewAdapterForFr
                         return true;
                     }
                 });
-            }});
+            }
+        });
     }
 
     @Override
     public void onItemClick(View view, int position) {
         //
     }
-    public void askToAddOrNot(boolean flag, String username,View view){
+
+    public void askToAddOrNot(boolean flag, String username, View view) {
 
         PopupWindow askPopup;
 
@@ -290,11 +276,10 @@ public class FriendsPage extends HandelCommon implements RecycleViewAdapterForFr
 
 
         //put the message
-        if(flag) {
-            ((TextView)popupView.findViewById(R.id.messageQ)).setText("You want to remove " + username + " ?");
-        }
-        else {
-            ((TextView)popupView.findViewById(R.id.messageQ)).setText("You want to add " + username + " ?");
+        if (flag) {
+            ((TextView) popupView.findViewById(R.id.messageQ)).setText("You want to remove " + username + " ?");
+        } else {
+            ((TextView) popupView.findViewById(R.id.messageQ)).setText("You want to add " + username + " ?");
         }
 
 
@@ -310,7 +295,7 @@ public class FriendsPage extends HandelCommon implements RecycleViewAdapterForFr
                 String apiToken = getSharedPreferences("UserData", MODE_PRIVATE).getString("apiToken", null);
                 HandleRequests handleRequests = new HandleRequests(FriendsPage.this);
 
-                if(flag){
+                if (flag) {
 
                     handleRequests.removeFriend(apiToken, username,
                             new HandleRequests.VolleyResponseListener() {
@@ -325,15 +310,13 @@ public class FriendsPage extends HandelCommon implements RecycleViewAdapterForFr
                                         startActivity(intent);
 
                                         askPopup.dismiss();
-                                    }
-                                    else {
+                                    } else {
                                         Snackbar.make(view, "something wrong with your internet connection", Snackbar.LENGTH_LONG)
                                                 .setAction("Action", null).show();
                                     }
                                 }
                             });
-                }
-                else{
+                } else {
 
                     handleRequests.addFriend(apiToken, username,
                             new HandleRequests.VolleyResponseListener() {
@@ -348,8 +331,7 @@ public class FriendsPage extends HandelCommon implements RecycleViewAdapterForFr
                                         startActivity(intent);
 
                                         askPopup.dismiss();
-                                    }
-                                    else {
+                                    } else {
                                         Snackbar.make(view, "something wrong with your internet connection", Snackbar.LENGTH_LONG)
                                                 .setAction("Action", null).show();
                                     }

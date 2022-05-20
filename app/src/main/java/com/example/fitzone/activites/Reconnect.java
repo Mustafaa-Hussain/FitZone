@@ -41,7 +41,7 @@ public class Reconnect extends AppCompatActivity {
 
     public void goToTrainingPage(View view) {
         Intent testIntent;
-        testIntent = new Intent(getApplicationContext(), Training.class);
+        testIntent = new Intent(getApplicationContext(), HomeActivity.class);
         startActivity(testIntent);
         finish();
     }
