@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.BadgesFragment">
+    tools:context=".fragments.ProgramsFragment">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/badges_swipe_refresh"
+        android:id="@+id/programs_swipe_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -16,12 +16,10 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/badges_fragment_recycler_view"
+            android:id="@+id/programs_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="10dp"
-            tools:listitem="@layout/badge_item" />
+            tools:listitem="@layout/program_item" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

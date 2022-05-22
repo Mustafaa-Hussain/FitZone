@@ -1,6 +1,8 @@
 package com.example.fitzone.recycleViewAdapters;
 
-import android.content.Context;
+import static com.example.fitzone.common_functions.StaticFunctions.getHostUrl;
+
+import android.app.Activity;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -8,9 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.fitzone.activites.R;
 
 import org.json.JSONArray;
@@ -21,23 +23,24 @@ public class RecycleViewAdapterForDaysPrograms extends RecyclerView.Adapter<Recy
 
     private JSONArray mData;
     private LayoutInflater mInflater;
-    Context context;
+    Activity activity;
     private RecycleViewAdapterForDaysPrograms.ItemClickListener mClickListener;
 
+
     // data is passed into the constructor
-    public RecycleViewAdapterForDaysPrograms(Context context, JSONArray arrayOfDays) {
-        if (context == null)
+    public RecycleViewAdapterForDaysPrograms(Activity activity, JSONArray arrayOfDays) {
+        if (activity == null)
             return;
 
-        this.mInflater = LayoutInflater.from(context);
+        this.mInflater = LayoutInflater.from(activity);
         this.mData = arrayOfDays;
-        this.context = context;
+        this.activity = activity;
     }
 
     // inflates the row layout from xml when needed
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.program_structure, parent, false);
+        View view = mInflater.inflate(R.layout.badge_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -45,8 +48,27 @@ public class RecycleViewAdapterForDaysPrograms extends RecyclerView.Adapter<Recy
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         try {
-            holder.day.setText(mData.getString(position));
-            //put images in imageview
+            holder.trainingText.setText(mData.getString(position));
+
+            if (mData.getString(position).equals("Day: 1"))
+                Glide.with(activity)
+                        .load(getHostUrl(activity) + "...")
+                        .placeholder(R.drawable._1_train_hard)
+                        .centerCrop()
+                        .into(holder.trainingImage);
+            else if(mData.getString(position).equals("Day: 5"))
+                Glide.with(activity)
+                        .load(getHostUrl(activity) + "...")
+                        .placeholder(R.drawable._5_no_pain_no_gain)
+                        .centerCrop()
+                        .into(holder.trainingImage);
+            else if(mData.getString(position).equals("Day: 3"))
+                Glide.with(activity)
+                        .load(getHostUrl(activity) + "...")
+                        .placeholder(R.drawable._3_par_gym)
+                        .centerCrop()
+                        .into(holder.trainingImage);
+
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -62,19 +84,15 @@ public class RecycleViewAdapterForDaysPrograms extends RecyclerView.Adapter<Recy
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView day;
-        ImageView trainingLogo;
-        ImageView dayStatus;
-        LinearLayout day_layout;
+        TextView trainingText;
+        ImageView trainingImage;
 
         ViewHolder(View itemView) {
             super(itemView);
-            day = itemView.findViewById(R.id.dayText);
-            trainingLogo = itemView.findViewById(R.id.day_logo);
-            dayStatus = itemView.findViewById(R.id.dayStatus);
-            day_layout = itemView.findViewById(R.id.day_layout);
+            trainingText = itemView.findViewById(R.id.badge_text);
+            trainingImage = itemView.findViewById(R.id.badge_image);
 
-            day_layout.setOnClickListener(this);
+            itemView.findViewById(R.id.badge_item).setOnClickListener(this);
         }
 
 
@@ -86,8 +104,8 @@ public class RecycleViewAdapterForDaysPrograms extends RecyclerView.Adapter<Recy
     }
 
     // convenience method for getting data at click position
-    JSONObject getItem(int id) throws JSONException {
-        return (JSONObject) mData.get(id);
+    public String getItem(int id) throws JSONException {
+        return (String) mData.get(id);
     }
 
     // allows clicks events to be caught

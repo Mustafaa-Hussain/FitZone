@@ -1,7 +1,7 @@
-package com.example.fitzone.activites;
+package com.example.fitzone.activites.fragments;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
+import static com.example.fitzone.common_functions.StaticFunctions.getApiToken;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +21,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.fitzone.activites.Comments;
+import com.example.fitzone.activites.HomeActivity;
+import com.example.fitzone.activites.R;
 import com.example.fitzone.handelers.HandlePost;
 import com.example.fitzone.handelers.HandleRequests;
 import com.example.fitzone.recycleViewAdapters.RecycleViewAdapterForPosts;
@@ -29,34 +31,41 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class HomeFragment extends Fragment implements RecycleViewAdapterForPosts.ItemClickListener {
-    RecycleViewAdapterForPosts adapter;
-    RecyclerView recyclerView;
-    Button share, cancel;
+    private RecycleViewAdapterForPosts adapter;
+    private RecyclerView recyclerView;
+    private Button share, cancel;
 
-    PopupWindow popupWindow;
+    private PopupWindow popupWindow;
 
-    SwipeRefreshLayout swipeRefreshLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
-    FloatingActionButton addPost;
+    private FloatingActionButton addPost;
 
+    private HandleRequests handleRequests;
 
     public HomeFragment() {
         super(R.layout.fragment_home);
     }
 
+    private String apiToken;
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        //inflate elements
+        recyclerView = view.findViewById(R.id.recycleView);
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
 
         //adding new post
         try {
-            String apiToken = getActivity().getSharedPreferences("UserData", Context.MODE_PRIVATE).getString("apiToken", null);
+            handleRequests = new HandleRequests(getActivity());
+
+            apiToken = getApiToken(getActivity());
             addPost = view.findViewById(R.id.add_post_fab);
-            addPost.setOnClickListener(v -> {////////
+            addPost.setOnClickListener(v -> {
 
                 //handle adding new post
 
@@ -128,54 +137,39 @@ public class HomeFragment extends Fragment implements RecycleViewAdapterForPosts
                 });
             });
 
-            //request and display posts
-            HandleRequests handleRequests = new HandleRequests(getActivity());
-            handleRequests.getPosts(apiToken, (status, jsonObject) -> {
-                if (status) {
-                    recyclerView = view.findViewById(R.id.recycleView);
+            swipeRefreshLayout.setRefreshing(true);
+            getPosts();
 
-                    try {
-                        adapter = new RecycleViewAdapterForPosts(getActivity(), jsonObject.getJSONArray("posts"));
-                        adapter.setClickListener(HomeFragment.this);
-                        recyclerView.setHasFixedSize(true);
-                        recyclerView.setAdapter(adapter);
-                        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-            swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
-            swipeRefreshLayout.setOnRefreshListener(() -> {
-                //request and display posts
-                handleRequests.getPosts(apiToken, (status, jsonObject) -> {
-                    swipeRefreshLayout.setRefreshing(false);
-                    if (status) {
-                        recyclerView = view.findViewById(R.id.recycleView);
-
-                        try {
-                            adapter = new RecycleViewAdapterForPosts(getActivity(), jsonObject.getJSONArray("posts"));
-                            adapter.setClickListener(HomeFragment.this);
-                            recyclerView.setHasFixedSize(true);
-                            recyclerView.setAdapter(adapter);
-                            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            });
+            //get and display posts
+            swipeRefreshLayout.setOnRefreshListener(this::getPosts);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    //get and display post
+    private void getPosts(){
+        handleRequests.getPosts(apiToken, (status, jsonObject) -> {
+            swipeRefreshLayout.setRefreshing(false);
+            if (status) {
+                try {
+                    adapter = new RecycleViewAdapterForPosts(getActivity(), jsonObject.getJSONArray("posts"));
+                    adapter.setClickListener(HomeFragment.this);
+                    recyclerView.setHasFixedSize(true);
+                    recyclerView.setAdapter(adapter);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            swipeRefreshLayout.setRefreshing(false);
+        });
+    }
+
     @Override
     public void onItemClick(View view, int position) {
         try {
-            //Toast.makeText(this, "id: " + adapter.getItem(position).getString("id"), Toast.LENGTH_SHORT).show();
             if (view.getId() == R.id.like) {
                 //handle like button
                 String postID = adapter.getItem(position).getString("id");

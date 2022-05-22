@@ -1,4 +1,4 @@
-package com.example.fitzone.activites;
+package com.example.fitzone.activites.fragments;
 
 import static com.example.fitzone.common_functions.StaticFunctions.getHostUrl;
 
@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.example.fitzone.activites.R;
 import com.example.fitzone.retrofit_requists.data_models.badges.DataModelBadgesResponseItem;
 import com.example.fitzone.retrofit_requists.data_models.badges.Rule;
 

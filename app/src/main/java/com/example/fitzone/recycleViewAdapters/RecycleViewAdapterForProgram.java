@@ -1,6 +1,7 @@
 package com.example.fitzone.recycleViewAdapters;
 
-import android.content.Context;
+import android.annotation.SuppressLint;
+import android.app.Activity;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -13,26 +14,27 @@ import android.widget.TextView;
 
 
 import com.example.fitzone.activites.R;
+import com.example.fitzone.retrofit_requists.data_models.day_training_program.DayTrainingProgram;
+import com.example.fitzone.retrofit_requists.data_models.day_training_program.DayTrainingProgramItem;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class RecycleViewAdapterForProgram extends RecyclerView.Adapter<RecycleViewAdapterForProgram.ViewHolder> {
 
-    private JSONArray myPrograms;
+    private DayTrainingProgram myData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
-    Context context;
+    private Activity activity;
 
     // data is passed into the constructor
-    public RecycleViewAdapterForProgram(Context context, JSONArray arrayOfPrograms) {
-        if (context == null)
+    public RecycleViewAdapterForProgram(Activity activity, DayTrainingProgram arrayOfPrograms) {
+        if (activity == null)
             return;
 
-        this.mInflater = LayoutInflater.from(context);
-        this.myPrograms = arrayOfPrograms;
-        this.context = context;
+        this.mInflater = LayoutInflater.from(activity);
+        this.myData = arrayOfPrograms;
+        this.activity = activity;
     }
 
     // inflates the row layout from xml when needed
@@ -43,31 +45,25 @@ public class RecycleViewAdapterForProgram extends RecyclerView.Adapter<RecycleVi
     }
 
     // binds the data to the TextView in each row
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        try {
-            JSONObject training = myPrograms.getJSONObject(position);
-            holder.programName.setText(training.getString("TName"));
-            holder.programNo.setText(training.getString("TReps") + " X " + training.getString("TSets"));
+        holder.programName.setText(myData.get(position).getExercise_name());
+        holder.programNo.setText(myData.get(position).getReps() + " X " + myData.get(position).getSets());
 
-            //check and assign image to each training
-            if (training.getString("TName").equals(context.getString(R.string.squat)))
-                holder.programImage.setImageResource(R.drawable.static_squat);
-            else if (training.getString("TName").equals(context.getString(R.string.push_ups)))
-                holder.programImage.setImageResource(R.drawable.static_pushups);
-            else
-                holder.programImage.setImageResource(R.drawable.blank_training);
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        //check and assign image to each training
+        if (myData.get(position).getExercise_name().equals("squat"))
+            holder.programImage.setImageResource(R.drawable.static_squat);
+        else if (myData.get(position).getExercise_name().equals("push up"))
+            holder.programImage.setImageResource(R.drawable.static_pushups);
+        else
+            holder.programImage.setImageResource(R.drawable.blank_training);
     }
 
     // total number of rows
     @Override
     public int getItemCount() {
-        return myPrograms.length();
+        return myData.size();
     }
 
 
@@ -95,8 +91,8 @@ public class RecycleViewAdapterForProgram extends RecyclerView.Adapter<RecycleVi
     }
 
     // convenience method for getting data at click position
-    public JSONObject getItem(int id) throws JSONException {
-        return (JSONObject) myPrograms.get(id);
+    public DayTrainingProgramItem getItem(int id) throws JSONException {
+        return myData.get(id);
     }
 
     // allows clicks events to be caught

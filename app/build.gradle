@@ -117,6 +117,10 @@ dependencies {
     //glide
     implementation 'com.github.bumptech.glide:glide:4.13.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.13.0'
+
+    //for remote video view
+    implementation 'cn.jzvd:jiaozivideoplayer:7.7.0'
+
 }
 configurations {
     // Resolves dependency conflict caused by some dependencies use

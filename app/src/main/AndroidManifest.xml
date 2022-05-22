@@ -18,6 +18,12 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="n">
         <activity
+            android:name=".TrainingVideoView"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".TimerActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
@@ -63,7 +69,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".LivePreviewActivity"
             android:exported="false" />
@@ -71,7 +76,6 @@
             android:name=".SettingsActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-
     </application>
 
 </manifest>

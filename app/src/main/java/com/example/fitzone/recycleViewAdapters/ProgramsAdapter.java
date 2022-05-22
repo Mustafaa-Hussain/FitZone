@@ -14,22 +14,23 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.fitzone.activites.R;
-import com.example.fitzone.retrofit_requists.data_models.badges.BadgesResponse;
+import com.example.fitzone.retrofit_requists.data_models.programs.ProgramsResponse;
 
-public class BadgesAdapter extends RecyclerView.Adapter<BadgesAdapter.ViewHolder> {
+
+public class ProgramsAdapter extends RecyclerView.Adapter<ProgramsAdapter.ViewHolder> {
 
     private Activity activity;
-    private BadgesResponse myData;
+    private ProgramsResponse myData;
     private LayoutInflater myInflater;
     private ItemClickListener myClickListener;
 
-    public BadgesAdapter(Activity activity, BadgesResponse mData) {
+    public ProgramsAdapter(Activity activity, ProgramsResponse myData) {
         if (activity == null)
             return;
 
         this.activity = activity;
-        this.myInflater = LayoutInflater.from(activity);
-        this.myData = mData;
+        myInflater = LayoutInflater.from(activity);
+        this.myData = myData;
     }
 
     // allows clicks events to be caught
@@ -43,15 +44,14 @@ public class BadgesAdapter extends RecyclerView.Adapter<BadgesAdapter.ViewHolder
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        ImageView badgeImage;
-        TextView nameOfBadge;
+        private ImageView programImage;
+        private TextView programName;
 
-        ViewHolder(View itemView) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            badgeImage = itemView.findViewById(R.id.badge_image);
-            nameOfBadge = itemView.findViewById(R.id.badge_text);
-
-            itemView.findViewById(R.id.badge_item).setOnClickListener(this);
+            programImage = itemView.findViewById(R.id.program_image);
+            programName = itemView.findViewById(R.id.program_text);
+            itemView.findViewById(R.id.program_item).setOnClickListener(this);
         }
 
         @Override
@@ -63,19 +63,19 @@ public class BadgesAdapter extends RecyclerView.Adapter<BadgesAdapter.ViewHolder
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = myInflater.inflate(R.layout.badge_item, parent, false);
+    public ProgramsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = myInflater.inflate(R.layout.program_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.nameOfBadge.setText(myData.get(position).getName());
+    public void onBindViewHolder(@NonNull ProgramsAdapter.ViewHolder holder, int position) {
+        holder.programName.setText(myData.get(position).getName());
         Glide.with(activity)
-                .load(getHostUrl(activity) + myData.get(position).getImage())
+                .load(getHostUrl(activity) + "...")//will place image if exist later
+                .placeholder(R.drawable.main_exercies)
                 .centerCrop()
-                .placeholder(R.drawable.loading_spinner)
-                .into(holder.badgeImage);
+                .into(holder.programImage);
     }
 
     @Override

@@ -1,98 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".HomeFragment">
+    tools:context=".fragments.HomeFragment">
 
-    <ScrollView
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/profile_swipe_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-
-        <LinearLayout
-            android:id="@+id/userData"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/userImage"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_gravity="center"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="15dp"
-                android:layout_marginBottom="15dp"
-                android:src="@drawable/def_profile_image"/>
-
-            <TextView
-                android:id="@+id/userName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textSize="25dp"
-                android:textColor="@color/black"
-                android:text="@string/username"/>
 
             <LinearLayout
+                android:id="@+id/userData"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@color/semi_white">
-                <Button
-                    android:id="@+id/myFriends"
-                    android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/userImage"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:src="@drawable/def_profile_image" />
+
+                <TextView
+                    android:id="@+id/userName"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="3"
-                    android:text="@string/my_friends"
-                    android:layout_margin="10dp"
-                    android:background="@drawable/like_button"
-                    android:textAllCaps="false"/>
+                    android:gravity="center"
+                    android:text="@string/username"
+                    android:textColor="@color/black"
+                    android:textSize="25dp" />
 
-                <Button
-                    android:id="@+id/logout"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/button"
-                    android:layout_margin="10dp"
-                    android:text="@string/logout"
-                    android:textAllCaps="false"
-                    android:enabled="true"/>
-            </LinearLayout>
+                    android:background="@color/semi_white"
+                    android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textSize="20dp"
-                android:textColor="@color/black"
-                android:background="@color/white"
-                android:text="@string/my_posts"/>
+                    <Button
+                        android:id="@+id/myFriends"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_weight="3"
+                        android:background="@drawable/like_button"
+                        android:text="@string/my_friends"
+                        android:textAllCaps="false" />
 
-            <RelativeLayout
-                android:id="@+id/relativeLayoutOfPrograms"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                    <Button
+                        android:id="@+id/logout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/button"
+                        android:enabled="true"
+                        android:text="@string/logout"
+                        android:textAllCaps="false" />
+                </LinearLayout>
 
-                <ScrollView
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:gravity="center"
+                    android:text="@string/my_posts"
+                    android:textColor="@color/black"
+                    android:textSize="20dp" />
+
+                <RelativeLayout
+                    android:id="@+id/relativeLayoutOfPrograms"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recycleView"
+                    <ScrollView
                         android:layout_width="match_parent"
-                        android:layout_height="0dp" />
-                </ScrollView>
+                        android:layout_height="match_parent">
 
-            </RelativeLayout>
-        </LinearLayout>
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recycleView"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp" />
+                    </ScrollView>
 
-    </ScrollView>
+                </RelativeLayout>
+            </LinearLayout>
+
+        </ScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_post_inProfile_fab"
@@ -100,13 +110,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_gravity="bottom|end"
+        android:layout_margin="25dp"
         android:background="@drawable/like_button"
+        android:contentDescription="user posts"
         app:fabSize="normal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/add_post"
-        app:tint="@color/white"
-        android:layout_margin="25dp"
-        android:contentDescription="user posts" />
+        app:tint="@color/white" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:scrollbars="vertical"
-    tools:context=".BadgesMoreInfo">
+    tools:context=".fragments.BadgesMoreInfo">
 
     <ImageView
         android:id="@+id/badge_more_image"

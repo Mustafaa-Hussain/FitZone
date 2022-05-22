@@ -1,15 +1,11 @@
-package com.example.fitzone.activites;
+package com.example.fitzone.activites.fragments;
 
 import static com.example.fitzone.common_functions.StaticFunctions.getApiToken;
-import static com.example.fitzone.common_functions.StaticFunctions.getBaseUrl;
 import static com.example.fitzone.common_functions.StaticFunctions.getHostUrl;
 import static com.example.fitzone.common_functions.StaticFunctions.storeApiToken;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -27,9 +23,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.fitzone.OnSwipeTouchListener;
+import com.example.fitzone.activites.Comments;
+import com.example.fitzone.activites.FriendsPage;
+import com.example.fitzone.activites.LoginActivity;
+import com.example.fitzone.activites.R;
 import com.example.fitzone.handelers.HandlePost;
 import com.example.fitzone.handelers.HandleRequests;
 import com.example.fitzone.recycleViewAdapters.RecycleViewAdapterForPosts;
@@ -42,18 +43,23 @@ import org.json.JSONObject;
 
 public class ProfileFragment extends Fragment implements RecycleViewAdapterForPosts.ItemClickListener {
 
-    String userId;
-    RecycleViewAdapterForPosts adapter;
-    RecyclerView recyclerView;
-    Button share, cancel, yes, no, showMyFriends, logout;
+    private String userId;
+    private RecycleViewAdapterForPosts adapter;
+    private RecyclerView recyclerView;
+    private Button share, cancel, yes, no, showMyFriends, logout;
+    private TextView userName;
 
-    ImageView profileImage;
+    private ImageView profileImage;
 
-    String apiToken;
+    private String apiToken;
 
-    PopupWindow popupWindow;
+    private PopupWindow popupWindow;
 
-    FloatingActionButton addPost;
+    private FloatingActionButton addPost;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
+
+    private HandleRequests handleRequests;
 
     public ProfileFragment() {
         super(R.layout.fragment_profile);
@@ -63,17 +69,22 @@ public class ProfileFragment extends Fragment implements RecycleViewAdapterForPo
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        //inflate elements
+        userName = view.findViewById(R.id.userName);
         profileImage = view.findViewById(R.id.userImage);
+        swipeRefreshLayout = view.findViewById(R.id.profile_swipe_refresh);
+        showMyFriends = view.findViewById(R.id.myFriends);
+        recyclerView = view.findViewById(R.id.recycleView);
 
         apiToken = getApiToken(getActivity());
 
-        showMyFriends = view.findViewById(R.id.myFriends);
         showMyFriends.setOnClickListener(this::showMyFriends);
 
         logout = view.findViewById(R.id.logout);
         logout.setOnClickListener(this::logout);
 
-        recyclerView = view.findViewById(R.id.recycleView);
+        handleRequests = new HandleRequests(getActivity());
+
         recyclerView.setOnTouchListener(new OnSwipeTouchListener(getActivity()) {
 
             public void onSwipeTop() {
@@ -86,57 +97,10 @@ public class ProfileFragment extends Fragment implements RecycleViewAdapterForPo
 
         });
 
-        HandleRequests handleRequests = new HandleRequests(getActivity());
-        handleRequests.getUserProfile(apiToken, new HandleRequests.VolleyResponseListener() {
-            @Override
-            public void onResponse(boolean status, JSONObject jsonObject) {
-//                ((TextView)findViewById(R.id.userName)).setText(jsonObject.toString());
-                try {
-                    if (jsonObject.isNull("id"))
-                        return;
-                    userId = jsonObject.getString("id");
-                    ((TextView) view.findViewById(R.id.userName)).setText(jsonObject.getString("username"));
+        swipeRefreshLayout.setRefreshing(true);
+        getUserProfile();
 
-                    //fill avatar image
-                    Glide.with(getActivity())
-                            .load(getHostUrl(getActivity()) + jsonObject.getString("avatar"))
-                            .centerCrop()
-                            .circleCrop()
-                            .placeholder(R.drawable.loading_spinner)
-                            .into(profileImage);
-
-                    //request and display posts
-                    HandleRequests handleRequests;
-                    handleRequests = new HandleRequests(getActivity());
-                    handleRequests.getPosts(apiToken, new HandleRequests.VolleyResponseListener() {
-                        @Override
-                        public void onResponse(boolean status, JSONObject jsonObject) {
-                            if (status) {
-                                recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                                try {
-                                    JSONArray myPosts = new JSONArray();
-
-                                    for (int i = 0; i < jsonObject.getJSONArray("posts").length(); i++) {
-                                        if (jsonObject.getJSONArray("posts").getJSONObject(i).getString("user_id").equals(userId)) {
-                                            myPosts.put(jsonObject.getJSONArray("posts").getJSONObject(i));
-                                        }
-                                    }
-                                    adapter = new RecycleViewAdapterForPosts(getActivity(), myPosts);
-                                    adapter.setClickListener(ProfileFragment.this);
-                                    recyclerView.setAdapter(adapter);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                    });
-
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        swipeRefreshLayout.setOnRefreshListener(this::getUserProfile);
 
         addPost = view.findViewById(R.id.add_post_inProfile_fab);
         addPost.setOnClickListener(view12 -> {
@@ -170,8 +134,8 @@ public class ProfileFragment extends Fragment implements RecycleViewAdapterForPo
                     if (!caption.getText().equals("") && !content.getText().equals("")) {
 
                         int postType = 0;
-                        HandleRequests handleRequests1 = new HandleRequests(getActivity());
-                        handleRequests1.addPost(caption.getText().toString(), content.getText().toString(), postType, apiToken,
+                        handleRequests = new HandleRequests(getActivity());
+                        handleRequests.addPost(caption.getText().toString(), content.getText().toString(), postType, apiToken,
                                 new HandleRequests.VolleyResponseListener() {
                                     @Override
                                     public void onResponse(boolean status, JSONObject jsonObject) {
@@ -219,6 +183,57 @@ public class ProfileFragment extends Fragment implements RecycleViewAdapterForPo
         //handle deleting post
 
 
+    }
+
+    //get and display user data and posts
+    private void getUserProfile() {
+        handleRequests.getUserProfile(apiToken, (status, jsonObject) -> {
+            try {
+                if (jsonObject.isNull("id"))
+                    return;
+                userId = jsonObject.getString("id");
+                userName.setText(jsonObject.getString("username"));
+
+                //fill avatar image
+                Glide.with(getActivity())
+                        .load(getHostUrl(getActivity()) + jsonObject.getString("avatar"))
+                        .centerCrop()
+                        .circleCrop()
+                        .placeholder(R.drawable.loading_spinner)
+                        .into(profileImage);
+
+                //request and display posts
+                HandleRequests handleRequests12;
+                handleRequests12 = new HandleRequests(getActivity());
+                handleRequests12.getPosts(apiToken, new HandleRequests.VolleyResponseListener() {
+                    @Override
+                    public void onResponse(boolean status, JSONObject jsonObject) {
+                        if (status) {
+                            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                            try {
+                                JSONArray myPosts = new JSONArray();
+
+                                for (int i = 0; i < jsonObject.getJSONArray("posts").length(); i++) {
+                                    if (jsonObject.getJSONArray("posts").getJSONObject(i).getString("user_id").equals(userId)) {
+                                        myPosts.put(jsonObject.getJSONArray("posts").getJSONObject(i));
+                                    }
+                                }
+                                adapter = new RecycleViewAdapterForPosts(getActivity(), myPosts);
+                                adapter.setClickListener(ProfileFragment.this);
+                                recyclerView.setAdapter(adapter);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            swipeRefreshLayout.setRefreshing(false);
+        });
     }
 
     @Override

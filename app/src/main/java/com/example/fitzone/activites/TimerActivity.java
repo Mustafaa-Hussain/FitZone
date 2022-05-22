@@ -127,14 +127,16 @@ public class TimerActivity extends AppCompatActivity {
             waitTime(15);
         }
 
-        @SuppressLint("DefaultLocale")
-        String trainData = String.format("%s %d : %d %s",
-                getResources().getString(R.string.group_number),
-                trainingSetNumber,
-                trainingReps,
-                getResources().getString(R.string.times));
+        String trainData = "";
+        if (trainingSetNumber < trainingSets) {
+            trainData = String.format("\n%s %d : %d %s",
+                    getResources().getString(R.string.group_number),
+                    trainingSetNumber,
+                    trainingReps,
+                    getResources().getString(R.string.times));
+        }
 
-        trainingData.setText(trainingName + "\n" + trainData);
+        trainingData.setText(trainingName + trainData);
 
         GifImageView gifImageView = findViewById(R.id.training_gif_file);
 

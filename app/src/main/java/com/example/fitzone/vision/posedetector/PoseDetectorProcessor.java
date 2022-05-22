@@ -191,6 +191,9 @@ public class PoseDetectorProcessor
 
         int noOfTrains = 0;
 
+        if(result.isEmpty())
+            return;
+
         if (!result.get(0).isEmpty()) {
             try {
                 noOfTrains = Integer.parseInt(result.get(0).substring(result.get(0).indexOf(':') + 2,

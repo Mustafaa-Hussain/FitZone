@@ -228,4 +228,6 @@
     <string name="admin_panel">لوحة الادارة</string>
     <string name="in">في</string>
     <string name="seconds">ثواني</string>
+    <string name="programs">البرامج</string>
+    <string name="watch_an_explainer_video">شاهد فيديو توضيحي</string>
 </resources>

@@ -9,12 +9,16 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.example.fitzone.activites.fragments.HomeFragment;
+import com.example.fitzone.activites.fragments.ProfileFragment;
+import com.example.fitzone.activites.fragments.ProgramsFragment;
+import com.example.fitzone.activites.fragments.BadgesFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomeActivity extends AppCompatActivity {
     Fragment homeFragment,
             profileFragment,
-            trainingFragment,
+            programsFragment,
             trophiesFragment;
 
     String apiToken;
@@ -38,9 +42,9 @@ public class HomeActivity extends AppCompatActivity {
 
         homeFragment = new HomeFragment();
         profileFragment = new ProfileFragment();
-        trainingFragment = new TrainingFragment();
+        programsFragment = new ProgramsFragment();
 
-        trophiesFragment = new TrophiesFragment();
+        trophiesFragment = new BadgesFragment();
 
 
         setFragmentContent(homeFragment);
@@ -55,7 +59,7 @@ public class HomeActivity extends AppCompatActivity {
                     setFragmentContent(profileFragment);
                     break;
                 case R.id.training:
-                    setFragmentContent(trainingFragment);
+                    setFragmentContent(programsFragment);
                     break;
                 case R.id.badges:
                     setFragmentContent(trophiesFragment);
@@ -73,7 +77,7 @@ public class HomeActivity extends AppCompatActivity {
                     setFragmentContent(profileFragment);
                     break;
                 case R.id.training:
-                    setFragmentContent(trainingFragment);
+                    setFragmentContent(programsFragment);
                     break;
                 case R.id.badges:
                     setFragmentContent(trophiesFragment);
