@@ -1,6 +1,6 @@
-package com.example.fitzone.retrofit_requists.data_models.program_routine_responce
+package com.example.fitzone.retrofit_requists.data_models.program_routine
 
-data class X1(
+data class X5(
     val day: Int,
     val exercise_name: String,
     val order: Int,

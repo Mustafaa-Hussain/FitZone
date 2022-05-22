@@ -1,16 +1,11 @@
 package com.example.fitzone.recycleViewAdapters;
 
+import static com.example.fitzone.common_functions.StaticFunctions.getApiToken;
+import static com.example.fitzone.common_functions.StaticFunctions.getBaseUrl;
 import static com.example.fitzone.common_functions.StaticFunctions.getHostUrl;
 
 import android.app.Activity;
-import android.content.Context;
-
-import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.net.Uri;
-import android.util.Log;
-import android.util.Printer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,28 +17,53 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.MutableLiveData;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.example.fitzone.activites.R;
 import com.example.fitzone.handelers.HandlePost;
+import com.example.fitzone.retrofit_requists.ApiInterface;
+import com.example.fitzone.retrofit_requists.data_models.user_data.UserDataResponse;
+import com.example.fitzone.retrofit_requists.data_models.user_profile_data.Post;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.HashMap;
+import java.util.List;
+
+import cn.jzvd.JzvdStd;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private JSONArray mData;
+    private List<Post> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private HandlePost handlePost;
     private Activity activity;
 
+    private HashMap<String, Integer> userLevelWithTag = new HashMap<>();
+    private MutableLiveData<HashMap<String, Integer>> userLevel = new MutableLiveData();
+    private Retrofit retrofit;
+    private ApiInterface apiInterface;
+
     Integer[] colors;
 
     // data is passed into the constructor
-    public RecycleViewAdapterForPosts(Activity activity, JSONArray arrayOfPosts) {
+    public RecycleViewAdapterForPosts(Activity activity, List<Post> arrayOfPosts) {
         if (activity == null)
             return;
+
+        //retrofit builder
+        retrofit = new Retrofit.Builder()
+                .baseUrl(getBaseUrl(activity))
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        apiInterface = retrofit.create(ApiInterface.class);
 
         this.mInflater = LayoutInflater.from(activity);
         this.mData = arrayOfPosts;
@@ -80,149 +100,180 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
         }
     }
 
+    //get user level
+    private void getUserLevel(String username, String tag) {
+        if (apiInterface == null)
+            return;
+
+        Call<UserDataResponse> call = apiInterface.getUserData("Bearer " + getApiToken(activity), username);
+        call.enqueue(new Callback<UserDataResponse>() {
+            @Override
+            public void onResponse(Call<UserDataResponse> call, Response<UserDataResponse> response) {
+                if (response.body() == null)
+                    return;
+                userLevelWithTag.put(tag, response.body().getLevel());
+                userLevel.setValue(userLevelWithTag);
+            }
+
+            @Override
+            public void onFailure(Call<UserDataResponse> call, Throwable t) {
+                Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        try {
-            JSONObject post = mData.getJSONObject(position);
+        Post post = mData.get(position);
 
-            switch (getItemViewType(position)) {
-                case 0://this case for basic post
-                    ViewHolderBasic viewHolderBasic = (ViewHolderBasic) holder;
-                    viewHolderBasic.username.setText(post.getString("username"));
+        switch (getItemViewType(position)) {
+            case 0://this case for basic post
+                ViewHolderBasic viewHolderBasic = (ViewHolderBasic) holder;
+                viewHolderBasic.username.setText(post.getUsername());
 
-                    //fill avatar image
-                    Glide.with(activity)
-                            .load(getHostUrl(activity) + post.getString("user_avatar"))
-                            .centerCrop()
-                            .circleCrop()
-                            .placeholder(R.drawable.loading_spinner)
-                            .into(viewHolderBasic.profileImage);
+                getUserLevel(post.getUsername(), String.valueOf(post.getId()));
+                userLevel.observe((LifecycleOwner) activity, level -> {
+                    viewHolderBasic.level.append(" " + level.get(String.valueOf(mData.get(position).getId())));
+                });
 
-                    viewHolderBasic.initDate.setText(post.getString("created_at").substring(0, post.getString("created_at").indexOf('T')));
-                    viewHolderBasic.caption.setText(post.getString("caption"));
-                    viewHolderBasic.content.setText(post.getString("content"));
+                //fill avatar image
+                Glide.with(activity)
+                        .load(getHostUrl(activity) + post.getUser_avatar())
+                        .centerCrop()
+                        .circleCrop()
+                        .placeholder(R.drawable.loading_spinner)
+                        .into(viewHolderBasic.profileImage);
 
-                    viewHolderBasic.noOfLikes.setText(post.getString("number_of_likes"));
-                    viewHolderBasic.noOfComments.setText(post.getString("number_of_comments"));
+                viewHolderBasic.initDate.setText(post.getCreated_at().substring(0, post.getCreated_at().indexOf('T')));
+                viewHolderBasic.caption.setText(post.getCaption());
+                viewHolderBasic.content.setText(post.getContent());
 
-                    //to handle post by it's id
-                    viewHolderBasic.like.setHint(post.getString("liked"));
+                viewHolderBasic.noOfLikes.setText(String.valueOf(post.getNumber_of_likes()));
+                viewHolderBasic.noOfComments.setText(String.valueOf(post.getNumber_of_comments()));
 
-                    handlePost = new HandlePost(activity);
-                    handlePost.setPostData(post);
+                //to handle post by it's id
+                viewHolderBasic.like.setHint(String.valueOf(post.getLiked()));
 
-                    handlePost.setLikeButtonState(viewHolderBasic.like, post.getString("id"));
+                handlePost = new HandlePost(activity);
+                handlePost.setPostData(post);
 
-                    break;
-                case 1://this case for rating post
-                    ViewHolderRating viewHolderRating = (ViewHolderRating) holder;
-                    viewHolderRating.username.setText(post.getString("username"));
+                handlePost.setLikeButtonState(viewHolderBasic.like, post.getId());
 
-                    //fill avatar image
-                    Glide.with(activity)
-                            .load(getHostUrl(activity) + post.getString("user_avatar"))
-                            .centerCrop()
-                            .circleCrop()
-                            .placeholder(R.drawable.loading_spinner)
-                            .into(viewHolderRating.profileImage);
+                break;
+            case 1://this case for rating post
+                ViewHolderRating viewHolderRating = (ViewHolderRating) holder;
+                viewHolderRating.username.setText(post.getUsername());
 
-                    viewHolderRating.initDate.setText(post.getString("created_at").substring(0, post.getString("created_at").indexOf('T')));
-                    viewHolderRating.caption.setText(post.getString("caption"));
-                    viewHolderRating.content.setText(post.getString("content"));
+                getUserLevel(post.getUsername(), String.valueOf(post.getId()));
+                userLevel.observe((LifecycleOwner) activity, level -> {
+                    viewHolderRating.level.append(" " + level.get(String.valueOf(mData.get(position).getId())));
+                });
 
-                    viewHolderRating.noOfLikes.setText(post.getString("number_of_likes"));
-                    viewHolderRating.noOfComments.setText(post.getString("number_of_comments"));
+                //fill avatar image
+                Glide.with(activity)
+                        .load(getHostUrl(activity) + post.getUser_avatar())
+                        .centerCrop()
+                        .circleCrop()
+                        .placeholder(R.drawable.loading_spinner)
+                        .into(viewHolderRating.profileImage);
 
-                    //to handle post by it's id
-                    viewHolderRating.like.setHint(post.getString("liked"));
+                viewHolderRating.initDate.setText(post.getCreated_at().substring(0, post.getCreated_at().indexOf('T')));
+                viewHolderRating.caption.setText(post.getCaption());
+                viewHolderRating.content.setText(post.getContent());
 
-                    handlePost = new HandlePost(activity);
-                    handlePost.setPostData(post);
+                viewHolderRating.noOfLikes.setText(String.valueOf(post.getNumber_of_likes()));
+                viewHolderRating.noOfComments.setText(String.valueOf(post.getNumber_of_comments()));
 
-                    handlePost.setLikeButtonState(viewHolderRating.like, post.getString("id"));
+                //to handle post by it's id
+                viewHolderRating.like.setHint(String.valueOf(post.getLiked()));
 
-                    break;
-                case 2://this case for image post
-                    ViewHolderImage viewHolderImage = (ViewHolderImage) holder;
-                    viewHolderImage.username.setText(post.getString("username"));
+                handlePost = new HandlePost(activity);
+                handlePost.setPostData(post);
 
-                    //fill avatar image
-                    Glide.with(activity)
-                            .load(getHostUrl(activity) + post.getString("user_avatar"))
-                            .centerCrop()
-                            .circleCrop()
-                            .placeholder(R.drawable.loading_spinner)
-                            .into(viewHolderImage.profileImage);
+                handlePost.setLikeButtonState(viewHolderRating.like, post.getId());
 
-                    viewHolderImage.initDate.setText(post.getString("created_at").substring(0, post.getString("created_at").indexOf('T')));
-                    viewHolderImage.caption.setText(post.getString("caption"));
-                    viewHolderImage.content.setText(post.getString("content"));
+                break;
+            case 2://this case for image post
+                ViewHolderImage viewHolderImage = (ViewHolderImage) holder;
+                viewHolderImage.username.setText(post.getUsername());
 
-                    viewHolderImage.noOfLikes.setText(post.getString("number_of_likes"));
-                    viewHolderImage.noOfComments.setText(post.getString("number_of_comments"));
+                getUserLevel(post.getUsername(), String.valueOf(post.getId()));
+                userLevel.observe((LifecycleOwner) activity, level -> {
+                    viewHolderImage.level.append(" " + level.get(String.valueOf(mData.get(position).getId())));
+                });
 
-                    //to handle post by it's id
-                    viewHolderImage.like.setHint(post.getString("liked"));
+                //fill avatar image
+                Glide.with(activity)
+                        .load(getHostUrl(activity) + post.getUser_avatar())
+                        .centerCrop()
+                        .circleCrop()
+                        .placeholder(R.drawable.loading_spinner)
+                        .into(viewHolderImage.profileImage);
 
-                    handlePost = new HandlePost(activity);
-                    handlePost.setPostData(post);
+                viewHolderImage.initDate.setText(post.getCreated_at().substring(0, post.getCreated_at().indexOf('T')));
+                viewHolderImage.caption.setText(post.getCaption());
+                viewHolderImage.content.setText(post.getContent());
 
-                    handlePost.setLikeButtonState(viewHolderImage.like, post.getString("id"));
+                viewHolderImage.noOfLikes.setText(String.valueOf(post.getNumber_of_comments()));
+                viewHolderImage.noOfComments.setText(String.valueOf(post.getNumber_of_comments()));
 
-                    break;
-                case 3://this case for video post
-                    ViewHolderVideo viewHolderVideo = (ViewHolderVideo) holder;
-                    viewHolderVideo.username.setText(post.getString("username"));
+                //to handle post by it's id
+                viewHolderImage.like.setHint(String.valueOf(post.getLiked()));
 
-                    //fill avatar image
-                    Glide.with(activity)
-                            .load(getHostUrl(activity) + post.getString("user_avatar"))
-                            .centerCrop()
-                            .circleCrop()
-                            .placeholder(R.drawable.loading_spinner)
-                            .into(viewHolderVideo.profileImage);
+                handlePost = new HandlePost(activity);
+                handlePost.setPostData(post);
 
-                    viewHolderVideo.initDate.setText(post.getString("created_at").substring(0, post.getString("created_at").indexOf('T')));
-                    viewHolderVideo.caption.setText(post.getString("caption"));
-                    viewHolderVideo.content.setText(post.getString("content"));
+                handlePost.setLikeButtonState(viewHolderImage.like, post.getId());
 
-                    viewHolderVideo.noOfLikes.setText(post.getString("number_of_likes"));
-                    viewHolderVideo.noOfComments.setText(post.getString("number_of_comments"));
+                break;
+            case 3://this case for video post
+                ViewHolderVideo viewHolderVideo = (ViewHolderVideo) holder;
+                viewHolderVideo.username.setText(post.getUsername());
 
-                    //to handle post by it's id
-                    viewHolderVideo.like.setHint(post.getString("liked"));
+                getUserLevel(post.getUsername(), String.valueOf(post.getId()));
+                userLevel.observe((LifecycleOwner) activity, level -> {
+                    viewHolderVideo.level.append(" " + level.get(String.valueOf(mData.get(position).getId())));
+                });
 
-                    handlePost = new HandlePost(activity);
-                    handlePost.setPostData(post);
+                //fill avatar image
+                Glide.with(activity)
+                        .load(getHostUrl(activity) + post.getUser_avatar())
+                        .centerCrop()
+                        .circleCrop()
+                        .placeholder(R.drawable.loading_spinner)
+                        .into(viewHolderVideo.profileImage);
 
-                    handlePost.setLikeButtonState(viewHolderVideo.like, post.getString("id"));
+                viewHolderVideo.initDate.setText(post.getCreated_at().substring(0, post.getCreated_at().indexOf('T')));
+                viewHolderVideo.caption.setText(post.getCaption());
+                viewHolderVideo.content.setText(post.getContent());
 
-                    //set video to video view
-                    //this path for test only or for default video
-                    String videoPath = "android.resource://" + activity.getPackageName() + "/" + R.raw.push_ups_with_music;
-//                    videoPath = "http://" + "192.168.1.2" + ':' + "8000" + "";
-                    Uri uri = Uri.parse(videoPath);
-                    viewHolderVideo.postVideo.setVideoURI(uri);
-                    MediaController mediaController = new MediaController(activity);
-                    viewHolderVideo.postVideo.setMediaController(mediaController);
+                viewHolderVideo.noOfLikes.setText(String.valueOf(post.getNumber_of_likes()));
+                viewHolderVideo.noOfComments.setText(String.valueOf(post.getNumber_of_comments()));
 
-                    mediaController.setAnchorView(viewHolderVideo.postVideo);
+                //to handle post by it's id
+                viewHolderVideo.like.setHint(String.valueOf(post.getLiked()));
 
-                    break;
-                default:
-                    break;
-            }
+                handlePost = new HandlePost(activity);
+                handlePost.setPostData(post);
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+                handlePost.setLikeButtonState(viewHolderVideo.like, post.getId());
+
+                //set video to video view
+                viewHolderVideo.postVideo.setUp(getHostUrl(activity) + post.getContent(), "");
+                viewHolderVideo.postVideo.posterImageView.setImageDrawable(activity.getDrawable(R.drawable.static_squat));
+
+                break;
+            default:
+                break;
         }
+
     }
 
     // total number of rows
     @Override
     public int getItemCount() {
-        return mData.length();
+        return mData.size();
     }
 
 
@@ -233,7 +284,8 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
                 caption,
                 content,
                 noOfLikes,
-                noOfComments;
+                noOfComments,
+                level;
 
         ImageView profileImage;
 
@@ -248,6 +300,7 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
             noOfLikes = itemView.findViewById(R.id.noOfLikes);
             noOfComments = itemView.findViewById(R.id.noOfComments);
             profileImage = itemView.findViewById(R.id.userAvatar);
+            level = itemView.findViewById(R.id.level);
 
             like = itemView.findViewById(R.id.like);
             comment = itemView.findViewById(R.id.comment);
@@ -274,7 +327,8 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
                 caption,
                 content,
                 noOfLikes,
-                noOfComments;
+                noOfComments,
+                level;
 
         ImageView profileImage;
         RatingBar postRatingBar;
@@ -290,6 +344,7 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
             noOfLikes = itemView.findViewById(R.id.noOfLikes);
             noOfComments = itemView.findViewById(R.id.noOfComments);
             profileImage = itemView.findViewById(R.id.userAvatar);
+            level = itemView.findViewById(R.id.level);
 
             like = itemView.findViewById(R.id.like);
             comment = itemView.findViewById(R.id.comment);
@@ -318,7 +373,8 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
                 caption,
                 content,
                 noOfLikes,
-                noOfComments;
+                noOfComments,
+                level;
 
         ImageView profileImage,
                 postImage;
@@ -334,6 +390,7 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
             noOfLikes = itemView.findViewById(R.id.noOfLikes);
             noOfComments = itemView.findViewById(R.id.noOfComments);
             profileImage = itemView.findViewById(R.id.userAvatar);
+            level = itemView.findViewById(R.id.level);
 
             like = itemView.findViewById(R.id.like);
             comment = itemView.findViewById(R.id.comment);
@@ -362,11 +419,12 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
                 caption,
                 content,
                 noOfLikes,
-                noOfComments;
+                noOfComments,
+                level;
 
         ImageView profileImage;
 
-        VideoView postVideo;
+        JzvdStd postVideo;
 
         Button comment, like, more;
 
@@ -379,6 +437,7 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
             noOfLikes = itemView.findViewById(R.id.noOfLikes);
             noOfComments = itemView.findViewById(R.id.noOfComments);
             profileImage = itemView.findViewById(R.id.userAvatar);
+            level = itemView.findViewById(R.id.level);
 
             like = itemView.findViewById(R.id.like);
             comment = itemView.findViewById(R.id.comment);
@@ -401,8 +460,8 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
     }
 
     // convenience method for getting data at click position
-    public JSONObject getItem(int id) throws JSONException {
-        return (JSONObject) mData.get(id);
+    public Post getItem(int id) {
+        return mData.get(id);
     }
 
     // allows clicks events to be caught
@@ -413,11 +472,7 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
     //get item type by it's position
     @Override
     public int getItemViewType(int position) {
-        try {
-            return mData.getJSONObject(position).getInt("type");
-        } catch (JSONException e) {
-            return -1;
-        }
+        return mData.get(position).getType();
     }
 
     // parent activity will implement this method to respond to click events

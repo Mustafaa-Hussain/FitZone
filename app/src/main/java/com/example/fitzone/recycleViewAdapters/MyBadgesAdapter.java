@@ -15,16 +15,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.fitzone.activites.R;
 import com.example.fitzone.retrofit_requists.data_models.badges.BadgesResponse;
-import com.example.fitzone.retrofit_requists.data_models.user_data.Badge;
+import com.example.fitzone.retrofit_requists.data_models.user_profile_data.Badge;
 
-public class BadgesAdapter extends RecyclerView.Adapter<BadgesAdapter.ViewHolder> {
+import java.util.List;
+
+public class MyBadgesAdapter extends RecyclerView.Adapter<MyBadgesAdapter.ViewHolder> {
 
     private Activity activity;
-    private BadgesResponse myData;
+    private List<Badge> myData;
     private LayoutInflater myInflater;
-    private ItemClickListener myClickListener;
+    private BadgesAdapter.ItemClickListener myClickListener;
 
-    public BadgesAdapter(Activity activity, BadgesResponse mData) {
+    public MyBadgesAdapter(Activity activity, List<Badge> mData) {
         if (activity == null)
             return;
 
@@ -34,7 +36,7 @@ public class BadgesAdapter extends RecyclerView.Adapter<BadgesAdapter.ViewHolder
     }
 
     // allows clicks events to be caught
-    public void setClickListener(ItemClickListener itemClickListener) {
+    public void setClickListener(BadgesAdapter.ItemClickListener itemClickListener) {
         this.myClickListener = itemClickListener;
     }
 
@@ -64,13 +66,13 @@ public class BadgesAdapter extends RecyclerView.Adapter<BadgesAdapter.ViewHolder
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public MyBadgesAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = myInflater.inflate(R.layout.badge_item, parent, false);
-        return new ViewHolder(view);
+        return new MyBadgesAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MyBadgesAdapter.ViewHolder holder, int position) {
         holder.nameOfBadge.setText(myData.get(position).getName());
         Glide.with(activity)
                 .load(getHostUrl(activity) + myData.get(position).getImage())

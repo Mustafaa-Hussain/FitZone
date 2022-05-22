@@ -232,4 +232,7 @@
     <string name="seconds">seconds</string>
     <string name="programs">Programs</string>
     <string name="watch_an_explainer_video">Watch an explainer video</string>
+    <string name="my_badges">My Badges</string>
+    <string name="all_badges">All Badges</string>
+    <string name="level">Level</string>
 </resources>

@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.fitzone.activites.R;
+import com.example.fitzone.retrofit_requists.data_models.user_profile_data.Post;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,16 +16,16 @@ import org.json.JSONObject;
 
 public class HandlePost {
     Activity activity;
-    JSONObject data;
+    Post data;
     public HandlePost(Activity activity){
         this.activity = activity;
     }
 
-    public void setPostData(JSONObject data){
+    public void setPostData(Post data){
         this.data = data;
     }
 
-    public String getStatus(String id, JSONArray posts){
+    public String getStatus(int id, JSONArray posts){
         String status = "false";
 
         for(int i = 0; i < posts.length(); i++){
@@ -40,7 +41,7 @@ public class HandlePost {
         return status;
     }
 
-    public void setLikeButtonState(View view, String postID){
+    public void setLikeButtonState(View view, int postID){
         //get like state
 //        Toast.makeText(context, ((Button)view).getHint(), Toast.LENGTH_SHORT).show();
 
@@ -56,7 +57,7 @@ public class HandlePost {
         }
     }
 
-    public void likeOrDislike(String postID){
+    public void likeOrDislike(int postID){
 
         SharedPreferences apiTokenFile = activity.getSharedPreferences("UserData", Context.MODE_PRIVATE);
         String apiToken = apiTokenFile.getString("apiToken", null);

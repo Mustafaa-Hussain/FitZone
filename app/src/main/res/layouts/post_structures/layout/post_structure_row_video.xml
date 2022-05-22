@@ -65,11 +65,10 @@
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
-                        <VideoView
+                        <cn.jzvd.JzvdStd
                             android:id="@+id/video_post_video"
                             android:layout_width="match_parent"
-                            android:layout_height="200dp"
-                            android:padding="10dp"/>
+                            android:layout_height="200dp" />
                     </FrameLayout>
                 </androidx.cardview.widget.CardView>
 

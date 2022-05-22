@@ -1,9 +1,11 @@
 package com.example.fitzone.activites.fragments;
 
 import static com.example.fitzone.common_functions.StaticFunctions.getApiToken;
+import static com.example.fitzone.common_functions.StaticFunctions.getBaseUrl;
 import static com.example.fitzone.common_functions.StaticFunctions.getHostUrl;
 import static com.example.fitzone.common_functions.StaticFunctions.storeApiToken;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,11 +31,16 @@ import com.bumptech.glide.Glide;
 import com.example.fitzone.OnSwipeTouchListener;
 import com.example.fitzone.activites.Comments;
 import com.example.fitzone.activites.FriendsPage;
+import com.example.fitzone.activites.HomeActivity;
 import com.example.fitzone.activites.LoginActivity;
+import com.example.fitzone.activites.MainActivity;
 import com.example.fitzone.activites.R;
+import com.example.fitzone.activites.Reconnect;
 import com.example.fitzone.handelers.HandlePost;
 import com.example.fitzone.handelers.HandleRequests;
 import com.example.fitzone.recycleViewAdapters.RecycleViewAdapterForPosts;
+import com.example.fitzone.retrofit_requists.ApiInterface;
+import com.example.fitzone.retrofit_requists.data_models.user_profile_data.UserProfileResponse;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -41,9 +48,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class ProfileFragment extends Fragment implements RecycleViewAdapterForPosts.ItemClickListener {
 
-    private String userId;
+    private int userId;
     private RecycleViewAdapterForPosts adapter;
     private RecyclerView recyclerView;
     private Button share, cancel, yes, no, showMyFriends, logout;
@@ -60,6 +73,9 @@ public class ProfileFragment extends Fragment implements RecycleViewAdapterForPo
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private HandleRequests handleRequests;
+
+    private Retrofit retrofit;
+    private ApiInterface apiInterface;
 
     public ProfileFragment() {
         super(R.layout.fragment_profile);
@@ -97,8 +113,7 @@ public class ProfileFragment extends Fragment implements RecycleViewAdapterForPo
 
         });
 
-        swipeRefreshLayout.setRefreshing(true);
-        getUserProfile();
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         swipeRefreshLayout.setOnRefreshListener(this::getUserProfile);
 
@@ -143,9 +158,7 @@ public class ProfileFragment extends Fragment implements RecycleViewAdapterForPo
                                             Snackbar.make(view12, "post shared successfully", Snackbar.LENGTH_LONG)
                                                     .setAction("Action", null).show();
 
-                                            Intent intent;
-                                            intent = new Intent(getActivity(), ProfileFragment.class);
-                                            startActivity(intent);
+                                            getUserProfile();
 
                                             popupWindow.dismiss();
                                         } else {
@@ -183,170 +196,154 @@ public class ProfileFragment extends Fragment implements RecycleViewAdapterForPo
         //handle deleting post
 
 
+        //retrofit builder
+        retrofit = new Retrofit.Builder()
+                .baseUrl(getBaseUrl(getActivity()))
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        apiInterface = retrofit.create(ApiInterface.class);
+
+        swipeRefreshLayout.setRefreshing(true);
+        getUserProfile();
     }
 
     //get and display user data and posts
     private void getUserProfile() {
-        handleRequests.getUserProfile(apiToken, (status, jsonObject) -> {
-            try {
-                if (jsonObject.isNull("id"))
+
+        if (apiInterface == null)
+            return;
+
+        Call<UserProfileResponse> call = apiInterface.getUserProfileData("Bearer " + getApiToken(getActivity()));
+        call.enqueue(new Callback<UserProfileResponse>() {
+            @Override
+            public void onResponse(Call<UserProfileResponse> call, Response<UserProfileResponse> response) {
+                if (response.body() == null)
                     return;
-                userId = jsonObject.getString("id");
-                userName.setText(jsonObject.getString("username"));
+
+                userId = response.body().getId();
+                userName.setText(response.body().getUsername());
 
                 //fill avatar image
                 Glide.with(getActivity())
-                        .load(getHostUrl(getActivity()) + jsonObject.getString("avatar"))
+                        .load(getHostUrl(getActivity()) + response.body().getAvatar())
                         .centerCrop()
                         .circleCrop()
                         .placeholder(R.drawable.loading_spinner)
                         .into(profileImage);
 
-                //request and display posts
-                HandleRequests handleRequests12;
-                handleRequests12 = new HandleRequests(getActivity());
-                handleRequests12.getPosts(apiToken, new HandleRequests.VolleyResponseListener() {
-                    @Override
-                    public void onResponse(boolean status, JSONObject jsonObject) {
-                        if (status) {
-                            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                            try {
-                                JSONArray myPosts = new JSONArray();
-
-                                for (int i = 0; i < jsonObject.getJSONArray("posts").length(); i++) {
-                                    if (jsonObject.getJSONArray("posts").getJSONObject(i).getString("user_id").equals(userId)) {
-                                        myPosts.put(jsonObject.getJSONArray("posts").getJSONObject(i));
-                                    }
-                                }
-                                adapter = new RecycleViewAdapterForPosts(getActivity(), myPosts);
-                                adapter.setClickListener(ProfileFragment.this);
-                                recyclerView.setAdapter(adapter);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                });
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
+                adapter = new RecycleViewAdapterForPosts(getActivity(), response.body().getPosts());
+                adapter.setClickListener(ProfileFragment.this);
+                recyclerView.setAdapter(adapter);
+                swipeRefreshLayout.setRefreshing(false);
             }
-            swipeRefreshLayout.setRefreshing(false);
+
+            @Override
+            public void onFailure(Call<UserProfileResponse> call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false);
+            }
         });
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onItemClick(View view, int position) {
-        try {
-//            Toast.makeText(this, view.toString(), Toast.LENGTH_SHORT).show();
-            String postID = adapter.getItem(position).getString("id");
-            if (view.getId() == R.id.like) {
-                //handle like button
-                HandlePost handlePost = new HandlePost(getActivity());
-                //send request
-                handlePost.likeOrDislike(postID);
-                handlePost.setLikeButtonState(view, postID);
-                handlePost.updatePost();
 
-                int noOfLikesInt = Integer.parseInt(adapter.getItem(position).getString("number_of_likes"));
+        int postID = adapter.getItem(position).getId();
+        if (view.getId() == R.id.like) {
+            //handle like button
+            HandlePost handlePost = new HandlePost(getActivity());
+            //send request
+            handlePost.likeOrDislike(postID);
+            handlePost.setLikeButtonState(view, postID);
+            handlePost.updatePost();
 
-                RecyclerView.ViewHolder rv_view = recyclerView.findViewHolderForAdapterPosition(position);
-                TextView noOfLikes = rv_view.itemView.findViewById(R.id.noOfLikes);
+            int noOfLikesInt = adapter.getItem(position).getNumber_of_likes();
 
-                if (((Button) view.findViewById(R.id.like)).getHint().equals("true"))
-                    adapter.getItem(position).put("number_of_likes", --noOfLikesInt);
-                else
-                    adapter.getItem(position).put("number_of_likes", ++noOfLikesInt);
+            RecyclerView.ViewHolder rv_view = recyclerView.findViewHolderForAdapterPosition(position);
+            TextView noOfLikes = rv_view.itemView.findViewById(R.id.noOfLikes);
 
-                noOfLikes.setText(adapter.getItem(position).getString("number_of_likes"));
+            if (((Button) view.findViewById(R.id.like)).getHint().equals("true"))
+                adapter.getItem(position).setNumber_of_likes(--noOfLikesInt);
+            else
+                adapter.getItem(position).setNumber_of_likes(++noOfLikesInt);
 
-                //update no. of likes and no. of comments
+            noOfLikes.setText(adapter.getItem(position).getNumber_of_likes());
 
-            } else if (view.getId() == R.id.comment) {
-                //handle comment
-                Intent intent;
-                intent = new Intent(getActivity(), Comments.class);
-                intent.putExtra("post_id", adapter.getItem(position).getString("id"));
-                startActivity(intent);
-                //finish();
-            } else if (view.getId() == R.id.more) {
-                PopupWindow askPopup;
+            //update no. of likes and no. of comments
 
-                // inflate the layout of the popup window
-                LayoutInflater inflater = (LayoutInflater)
+        } else if (view.getId() == R.id.comment) {
+            //handle comment
+            Intent intent;
+            intent = new Intent(getActivity(), Comments.class);
+            intent.putExtra("post_id", adapter.getItem(position).getId());
+            startActivity(intent);
+            //finish();
+        } else if (view.getId() == R.id.more) {
+            PopupWindow askPopup;
 
-                        getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View popupView = inflater.inflate(R.layout.ask_if_yes_or_no, null);
+            // inflate the layout of the popup window
+            LayoutInflater inflater = (LayoutInflater)
 
-                // create the popup window
-                int width = LinearLayout.LayoutParams.MATCH_PARENT;
-                int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-                boolean focusable = true; // lets taps outside the popup also dismiss it
-                askPopup = new PopupWindow(popupView, width, height, true);
+                    getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View popupView = inflater.inflate(R.layout.ask_if_yes_or_no, null);
 
-
-                //put the message
-                ((TextView) popupView.findViewById(R.id.messageQ)).setText("You want to remove this post?");
-
-                // show the popup window
-                // which view you pass in doesn't matter, it is only used for the window token
-                askPopup.showAtLocation(view, Gravity.CENTER, 0, 0);
-
-                yes = popupView.findViewById(R.id.yes);
-                yes.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        String apiToken = getActivity().getSharedPreferences("UserData", Context.MODE_PRIVATE).getString("apiToken", null);
-                        HandleRequests handleRequests = new HandleRequests(getActivity());
-
-                        handleRequests.removePost(apiToken, postID,
-                                new HandleRequests.VolleyResponseListener() {
-                                    @Override
-                                    public void onResponse(boolean status, JSONObject jsonObject) {
-                                        if (status) {
-                                            Intent intent;
-                                            Snackbar.make(view, "Post Removed.", Snackbar.LENGTH_LONG)
-                                                    .setAction("Action", null).show();
-
-                                            intent = new Intent(getActivity(), ProfileFragment.class);
-                                            startActivity(intent);
-
-                                            askPopup.dismiss();
-                                        } else {
-                                            Snackbar.make(view, "Cannot delete this post", Snackbar.LENGTH_LONG)
-                                                    .setAction("Action", null).show();
-                                        }
-                                    }
-                                });
-                    }
-
-                });
-
-                no = popupView.findViewById(R.id.no);
-                no.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        askPopup.dismiss();
-                    }
-                });
-
-                // dismiss the popup window when touched
-                popupView.setOnTouchListener(new View.OnTouchListener() {
-
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        //askPopup.dismiss();
-                        return true;
-                    }
-                });
-            }
+            // create the popup window
+            int width = LinearLayout.LayoutParams.MATCH_PARENT;
+            int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+            boolean focusable = true; // lets taps outside the popup also dismiss it
+            askPopup = new PopupWindow(popupView, width, height, true);
 
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+            //put the message
+            ((TextView) popupView.findViewById(R.id.messageQ)).setText("You want to remove this post?");
+
+            // show the popup window
+            // which view you pass in doesn't matter, it is only used for the window token
+            askPopup.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+            yes = popupView.findViewById(R.id.yes);
+            yes.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    String apiToken = getActivity().getSharedPreferences("UserData", Context.MODE_PRIVATE).getString("apiToken", null);
+                    HandleRequests handleRequests = new HandleRequests(getActivity());
+
+                    handleRequests.removePost(apiToken, postID,
+                            (status, jsonObject) -> {
+                                if (status) {
+                                    Intent intent;
+                                    Snackbar.make(view, "Post Removed.", Snackbar.LENGTH_LONG)
+                                            .setAction("Action", null).show();
+
+                                    getUserProfile();
+
+                                    askPopup.dismiss();
+                                } else {
+                                    Snackbar.make(view, "Cannot delete this post", Snackbar.LENGTH_LONG)
+                                            .setAction("Action", null).show();
+                                }
+                            });
+                }
+
+            });
+
+            no = popupView.findViewById(R.id.no);
+            no.setOnClickListener(v -> askPopup.dismiss());
+
+            // dismiss the popup window when touched
+            popupView.setOnTouchListener(new View.OnTouchListener() {
+
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    //askPopup.dismiss();
+                    return true;
+                }
+            });
         }
+
+
     }
 
     public void showMyFriends(View view) {

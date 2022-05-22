@@ -1,6 +1,7 @@
 package com.example.fitzone.activites.fragments;
 
 import static com.example.fitzone.common_functions.StaticFunctions.getApiToken;
+import static com.example.fitzone.common_functions.StaticFunctions.getBaseUrl;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,10 +29,20 @@ import com.example.fitzone.activites.R;
 import com.example.fitzone.handelers.HandlePost;
 import com.example.fitzone.handelers.HandleRequests;
 import com.example.fitzone.recycleViewAdapters.RecycleViewAdapterForPosts;
+import com.example.fitzone.retrofit_requists.ApiInterface;
+import com.example.fitzone.retrofit_requists.data_models.all_posts.AllPostsResponse;
+import com.example.fitzone.retrofit_requists.data_models.user_profile_data.Comment;
+import com.example.fitzone.retrofit_requists.data_models.user_profile_data.Post;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
-import org.json.JSONException;
+import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HomeFragment extends Fragment implements RecycleViewAdapterForPosts.ItemClickListener {
     private RecycleViewAdapterForPosts adapter;
@@ -50,6 +62,8 @@ public class HomeFragment extends Fragment implements RecycleViewAdapterForPosts
     }
 
     private String apiToken;
+    private Retrofit retrofit;
+    private ApiInterface apiInterface;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -58,6 +72,15 @@ public class HomeFragment extends Fragment implements RecycleViewAdapterForPosts
         //inflate elements
         recyclerView = view.findViewById(R.id.recycleView);
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+
+
+        //retrofit builder
+        retrofit = new Retrofit.Builder()
+                .baseUrl(getBaseUrl(getActivity()))
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        apiInterface = retrofit.create(ApiInterface.class);
+
 
         //adding new post
         try {
@@ -149,95 +172,134 @@ public class HomeFragment extends Fragment implements RecycleViewAdapterForPosts
     }
 
     //get and display post
-    private void getPosts(){
-        handleRequests.getPosts(apiToken, (status, jsonObject) -> {
-            swipeRefreshLayout.setRefreshing(false);
-            if (status) {
-                try {
-                    adapter = new RecycleViewAdapterForPosts(getActivity(), jsonObject.getJSONArray("posts"));
-                    adapter.setClickListener(HomeFragment.this);
-                    recyclerView.setHasFixedSize(true);
-                    recyclerView.setAdapter(adapter);
-                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                } catch (JSONException e) {
-                    e.printStackTrace();
+    private void getPosts() {
+        if (apiInterface == null)
+            return;
+
+        Call<AllPostsResponse> call = apiInterface.getAllPosts("Bearer " + getApiToken(getActivity()));
+        call.enqueue(new Callback<AllPostsResponse>() {
+            @Override
+            public void onResponse(Call<AllPostsResponse> call, Response<AllPostsResponse> response) {
+                if (response.body() == null)
+                    return;
+
+
+                ArrayList posts = new ArrayList();
+                ArrayList comments = new ArrayList();
+
+                //create posts List
+                for (com.example.fitzone.retrofit_requists.data_models.all_posts.Post post : response.body().getPosts()) {
+                    for (com.example.fitzone.retrofit_requists.data_models.all_posts.Comment comment : post.getComments()) {
+                        comments.add(new Comment(comment.getContent(),
+                                comment.getCreated_at(),
+                                comment.getId(),
+                                comment.getPost_id(),
+                                comment.getUpdated_at(),
+                                comment.getUser_avatar(),
+                                comment.getUser_id(),
+                                comment.getUsername()));
+                    }
+
+                    posts.add(new Post(post.getCaption(),
+                            comments,
+                            post.getContent(),
+                            post.getCreated_at(),
+                            post.getId(),
+                            post.getLiked(),
+                            post.getLikes(),
+                            post.getNumber_of_comments(),
+                            post.getNumber_of_likes(),
+                            post.getType(),
+                            post.getUpdated_at(),
+                            post.getUser_avatar(),
+                            post.getUser_id(),
+                            post.getUsername()));
                 }
+
+                adapter = new RecycleViewAdapterForPosts(getActivity(), posts);
+                adapter.setClickListener(HomeFragment.this);
+                recyclerView.setHasFixedSize(true);
+                recyclerView.setAdapter(adapter);
+                recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                swipeRefreshLayout.setRefreshing(false);
             }
-            swipeRefreshLayout.setRefreshing(false);
+
+            @Override
+            public void onFailure(Call<AllPostsResponse> call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false);
+            }
         });
+
     }
 
     @Override
     public void onItemClick(View view, int position) {
-        try {
-            if (view.getId() == R.id.like) {
-                //handle like button
-                String postID = adapter.getItem(position).getString("id");
-                HandlePost handlePost = new HandlePost(getActivity());
-                //send request
-                handlePost.likeOrDislike(postID);
-                handlePost.setLikeButtonState(view, postID);
-                handlePost.updatePost();
+        if (view.getId() == R.id.like) {
+            //handle like button
+            int postID = adapter.getItem(position).getId();
+            HandlePost handlePost = new HandlePost(getActivity());
+            //send request
+            handlePost.likeOrDislike(postID);
+            handlePost.setLikeButtonState(view, postID);
+            handlePost.updatePost();
 
-                int noOfLikesInt = Integer.parseInt(adapter.getItem(position).getString("number_of_likes"));
+            int noOfLikesInt = adapter.getItem(position).getNumber_of_likes();
 
-                RecyclerView.ViewHolder rv_view = recyclerView.findViewHolderForAdapterPosition(position);
-                TextView noOfLikes = rv_view.itemView.findViewById(R.id.noOfLikes);
+            RecyclerView.ViewHolder rv_view = recyclerView.findViewHolderForAdapterPosition(position);
+            TextView noOfLikes = rv_view.itemView.findViewById(R.id.noOfLikes);
 
-                if (((Button) view.findViewById(R.id.like)).getHint().equals("true"))
-                    adapter.getItem(position).put("number_of_likes", --noOfLikesInt);
-                else
-                    adapter.getItem(position).put("number_of_likes", ++noOfLikesInt);
+            if (((Button) view.findViewById(R.id.like)).getHint().equals("true"))
+                adapter.getItem(position).setNumber_of_likes(--noOfLikesInt);
+            else
+                adapter.getItem(position).setNumber_of_likes(++noOfLikesInt);
 
-                noOfLikes.setText(adapter.getItem(position).getString("number_of_likes"));
+            noOfLikes.setText(adapter.getItem(position).getNumber_of_likes());
 
-                //update no. of likes and no. of comments
+            //update no. of likes and no. of comments
 
-            } else if (view.getId() == R.id.comment) {
-                //handle comment
-                Intent intent;
-                intent = new Intent(getContext(), Comments.class);
-                intent.putExtra("post_id", adapter.getItem(position).getString("id"));
-                startActivity(intent);
-                //finish();
-            } else if (view.getId() == R.id.more) {
-                PopupWindow askPopup;
+        } else if (view.getId() == R.id.comment) {
+            //handle comment
+            Intent intent;
+            intent = new Intent(getContext(), Comments.class);
+            intent.putExtra("post_id", adapter.getItem(position).getId());
+            startActivity(intent);
+            //finish();
+        } else if (view.getId() == R.id.more) {
+            PopupWindow askPopup;
 
-                // inflate the layout of the popup window
-                LayoutInflater inflater = (LayoutInflater)
+            // inflate the layout of the popup window
+            LayoutInflater inflater = (LayoutInflater)
 
-                        getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View popupView = inflater.inflate(R.layout.ask_if_yes_or_no, null);
+                    getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View popupView = inflater.inflate(R.layout.ask_if_yes_or_no, null);
 
-                // create the popup window
-                int width = LinearLayout.LayoutParams.MATCH_PARENT;
-                int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-                boolean focusable = true; // lets taps outside the popup also dismiss it
-                askPopup = new PopupWindow(popupView, width, height, true);
-
-
-                //put the message
-                ((TextView) popupView.findViewById(R.id.messageQ)).setText(R.string.more_mesage);
+            // create the popup window
+            int width = LinearLayout.LayoutParams.MATCH_PARENT;
+            int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+            boolean focusable = true; // lets taps outside the popup also dismiss it
+            askPopup = new PopupWindow(popupView, width, height, true);
 
 
-                // show the popup window
-                // which view you pass in doesn't matter, it is only used for the window token
-                askPopup.showAtLocation(view, Gravity.CENTER, 0, 0);
+            //put the message
+            ((TextView) popupView.findViewById(R.id.messageQ)).setText(R.string.more_mesage);
 
-                ((LinearLayout) popupView.findViewById(R.id.yes_no_buttons)).setVisibility(View.GONE);
-                //get info about user that post this post
 
-                // dismiss the popup window when touched
-                popupView.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        askPopup.dismiss();
-                        return true;
-                    }
-                });
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+            // show the popup window
+            // which view you pass in doesn't matter, it is only used for the window token
+            askPopup.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+            ((LinearLayout) popupView.findViewById(R.id.yes_no_buttons)).setVisibility(View.GONE);
+            //get info about user that post this post
+
+            // dismiss the popup window when touched
+            popupView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    askPopup.dismiss();
+                    return true;
+                }
+            });
         }
     }
 

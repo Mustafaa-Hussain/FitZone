@@ -212,55 +212,6 @@ public class HandleRequests {
         }
     }
 
-    public void getUserProfile(String apiToken, final VolleyResponseListener volleyResponseListener) {
-        final int[] statusCode = {0};
-        boolean[] status = {false};
-        final JSONObject[] posts = {null};
-        String URL = API_SERVER_URL + "users/profile";
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        status[0] = true;
-                        posts[0] = response;
-                        volleyResponseListener.onResponse(status[0], posts[0]);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                if (statusCode[0] == 200) {
-                    Toast.makeText(activity, "You Are Not logged in", Toast.LENGTH_SHORT).show();
-                }
-                volleyResponseListener.onResponse(status[0], null);
-            }
-        }) {
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
-            }
-
-            @Override
-            protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
-                statusCode[0] = response.statusCode;
-                return super.parseNetworkResponse(response);
-            }
-
-            //to send api_token
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headerMap = new HashMap<String, String>();
-                headerMap.put("Content-Type", "application/json");
-                headerMap.put("Authorization", "Bearer " + apiToken);
-                return headerMap;
-            }
-        };
-
-        MySingleton.getInstance(activity).addToRequestQueue(jsonObjectRequest);
-
-    }
-
     public void logout(String apiToken, final VolleyResponseListener volleyResponseListener) {
         final int[] statusCode = {0};
         boolean status[] = {false};
@@ -360,7 +311,7 @@ public class HandleRequests {
 
     }
 
-    public void setLike(String apiToken, String postID, final VolleyResponseListener volleyResponseListener) {
+    public void setLike(String apiToken, int postID, final VolleyResponseListener volleyResponseListener) {
         final int[] statusCode = {0};
         boolean status[] = {false};
         final JSONObject[] posts = {null};
@@ -410,7 +361,7 @@ public class HandleRequests {
 
     }
 
-    public void setDislike(String apiToken, String postID, final VolleyResponseListener volleyResponseListener) {
+    public void setDislike(String apiToken, int postID, final VolleyResponseListener volleyResponseListener) {
         final int[] statusCode = {0};
         boolean status[] = {false};
         final JSONObject[] posts = {null};
@@ -431,55 +382,6 @@ public class HandleRequests {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(activity, error.getMessage(), Toast.LENGTH_SHORT).show();
-                volleyResponseListener.onResponse(status[0], null);
-            }
-        }) {
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
-            }
-
-            @Override
-            protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
-                statusCode[0] = response.statusCode;
-                return super.parseNetworkResponse(response);
-            }
-
-            //to send api_token
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headerMap = new HashMap<String, String>();
-                headerMap.put("Content-Type", "application/json");
-                headerMap.put("Authorization", "Bearer " + apiToken);
-                return headerMap;
-            }
-        };
-
-        MySingleton.getInstance(activity).addToRequestQueue(jsonObjectRequest);
-
-    }
-
-    public void searchUser(String apiToken, String username, final VolleyResponseListener volleyResponseListener) {
-        final int[] statusCode = {0};
-        boolean status[] = {false};
-        final JSONObject[] posts = {null};
-
-        String URL = API_SERVER_URL + "users/" + username;
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        status[0] = true;
-                        posts[0] = response;
-
-                        volleyResponseListener.onResponse(status[0], posts[0]);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
                 volleyResponseListener.onResponse(status[0], null);
             }
         }) {
@@ -607,56 +509,7 @@ public class HandleRequests {
 
     }
 
-    public void getAllUsers(String apiToken, final VolleyResponseListener volleyResponseListener) {
-        final int[] statusCode = {0};
-        boolean status[] = {false};
-        final JSONObject[] posts = {null};
-
-        String URL = API_SERVER_URL + "users/";
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        status[0] = true;
-                        posts[0] = response;
-
-                        volleyResponseListener.onResponse(status[0], posts[0]);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                volleyResponseListener.onResponse(status[0], null);
-            }
-        }) {
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
-            }
-
-            @Override
-            protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
-                statusCode[0] = response.statusCode;
-                return super.parseNetworkResponse(response);
-            }
-
-            //to send api_token
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headerMap = new HashMap<String, String>();
-                headerMap.put("Content-Type", "application/json");
-                headerMap.put("Authorization", "Bearer " + apiToken);
-                return headerMap;
-            }
-        };
-
-        MySingleton.getInstance(activity).addToRequestQueue(jsonObjectRequest);
-
-    }
-
-    public void removePost(String apiToken, String postID, final VolleyResponseListener volleyResponseListener) {
+    public void removePost(String apiToken, int postID, final VolleyResponseListener volleyResponseListener) {
         final int[] statusCode = {0};
         boolean status[] = {false};
         final JSONObject[] posts = {null};

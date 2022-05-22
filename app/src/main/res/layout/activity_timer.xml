@@ -22,6 +22,7 @@
             android:layout_margin="10dp"
             android:background="@drawable/like_button"
             android:gravity="center"
+            android:padding="10dp"
             android:textColor="@color/black"
             android:textSize="25sp"
             tools:text="@string/timer" />
@@ -38,10 +39,12 @@
 
         <TextView
             android:id="@+id/timer"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="40dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/button"
             android:gravity="center"
+            android:padding="5dp"
             android:textColor="@color/black"
             android:textSize="60sp"
             tools:text="Timer" />
@@ -55,17 +58,7 @@
             android:textOn="@string/start" />
 
         <Button
-            android:id="@+id/start"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="25dp"
-            android:background="@drawable/button"
-            android:text="@string/start"
-            android:textAllCaps="false"
-            android:visibility="gone" />
-
-        <Button
-            android:id="@+id/finish"
+            android:id="@+id/training_finish"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="25dp"

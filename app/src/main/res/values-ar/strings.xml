@@ -230,4 +230,7 @@
     <string name="seconds">ثواني</string>
     <string name="programs">البرامج</string>
     <string name="watch_an_explainer_video">شاهد فيديو توضيحي</string>
+    <string name="my_badges">جوائزي</string>
+    <string name="all_badges">كل الجوائز المتاحة</string>
+    <string name="level">المستوى</string>
 </resources>

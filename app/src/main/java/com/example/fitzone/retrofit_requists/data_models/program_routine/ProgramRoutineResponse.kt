@@ -1,4 +1,4 @@
-package com.example.fitzone.retrofit_requists.data_models.program_routine_responce
+package com.example.fitzone.retrofit_requists.data_models.program_routine
 
 data class ProgramRoutineResponse(
     val `1`: List<X1>,

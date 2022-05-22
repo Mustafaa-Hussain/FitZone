@@ -88,6 +88,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setFragmentContent(Fragment fragment) {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fl_home_activity, fragment).commit();
+                .replace(R.id.fl_home_activity, fragment)
+                .commit();
     }
 }

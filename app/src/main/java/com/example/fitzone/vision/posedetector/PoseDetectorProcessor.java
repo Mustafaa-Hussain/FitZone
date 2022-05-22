@@ -179,6 +179,8 @@ public class PoseDetectorProcessor
                         });
     }
 
+    private int doneNO = 0;
+
     @Override
     protected void onSuccess(
             @NonNull PoseWithClassification poseWithClassification,
@@ -191,7 +193,7 @@ public class PoseDetectorProcessor
 
         int noOfTrains = 0;
 
-        if(result.isEmpty())
+        if (result.isEmpty())
             return;
 
         if (!result.get(0).isEmpty()) {
@@ -204,7 +206,8 @@ public class PoseDetectorProcessor
         }
 
 
-        if (noOfTrains == trainingReps) {
+        if (noOfTrains == trainingReps && doneNO < 1) {
+            doneNO++;
             ToneGenerator tg = new ToneGenerator(AudioManager.AUDIOFOCUS_REQUEST_GRANTED, 100);
             tg.startTone(ToneGenerator.TONE_CDMA_ABBR_INTERCEPT);
             goToTimerActivity();

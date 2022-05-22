@@ -1,5 +1,8 @@
 package com.example.fitzone.activites;
 
+import static com.example.fitzone.common_functions.StaticFunctions.getApiToken;
+import static com.example.fitzone.common_functions.StaticFunctions.getBaseUrl;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -15,31 +18,44 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.example.fitzone.handelers.HandleRequests;
+import com.example.fitzone.retrofit_requists.ApiInterface;
+import com.example.fitzone.retrofit_requists.data_models.exercise_data.ExerciseData;
+import com.example.fitzone.retrofit_requists.data_models.record_sesponse.RecordResponse;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONObject;
 
 import pl.droidsonroids.gif.GifImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class TimerActivity extends AppCompatActivity {
 
-    TextView timerTextView;
+    private TextView timerTextView;
 
-    String trainingName;
-    int trainingReps,
+    private String trainingName;
+    private int trainingReps,
             trainingSets,
             trainingSetNumber,
             lastTime;
 
-    Button yes, no;
+    private Button yes, no;
 
-    ToggleButton toggleButton;
+    private ToggleButton toggleButton;
 
-    Handler timerHandler = new Handler();
-    Runnable timerRunnable = null;
+    private Handler timerHandler = new Handler();
+    private Runnable timerRunnable = null;
+
+    private Retrofit retrofit;
+    private ApiInterface apiInterface;
+
 
     //timer that take a time and wait for it
     private void waitTime(int limit) {
@@ -84,12 +100,11 @@ public class TimerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timer);
-
+        //inflate elements
         TextView trainingData = findViewById(R.id.training_name);
-
         timerTextView = findViewById(R.id.timer);
-
         toggleButton = findViewById(R.id.timer_toggle_button);
+
         toggleButton.setOnCheckedChangeListener((compoundButton, isChecked) -> {
             if (isChecked) {
                 timerHandler.removeCallbacks(timerRunnable);
@@ -105,15 +120,30 @@ public class TimerActivity extends AppCompatActivity {
         trainingSetNumber = intent.getIntExtra("setNumber", 1);
         lastTime = intent.getIntExtra("lastTime", 0);//for store last set taken time
 
+
+        //retrofit builder
+        retrofit = new Retrofit.Builder()
+                .baseUrl(getBaseUrl(this))
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        apiInterface = retrofit.create(ApiInterface.class);
+
+
         if (trainingSetNumber > 1) {
             if (trainingSetNumber > trainingSets) {
                 timerHandler.removeCallbacks(timerRunnable);
                 timerTextView.setTextSize(20);
                 trainingData.setText(trainingName);
                 toggleButton.setVisibility(View.GONE);
-                timerTextView.setText(String.format("%s \n %d X %d in %d seconds.", trainingName, trainingReps, trainingSets, lastTime));
+                timerTextView.setText(String.format("%d %s in %d seconds.",
+                        trainingReps * trainingSets,
+                        trainingName,
+                        lastTime));
 
-                //TODO send completed data to server
+                // send completed data to server
+                sendCompletedResult(trainingName,
+                        trainingReps * trainingSets,
+                        lastTime);
 
 //                askToShareOrNot(trainingName,
 //                        String.format("%d X %d " + getString(R.string.in) + " %d " + getString(R.string.seconds), trainingReps, trainingSets, lastTime),
@@ -128,7 +158,7 @@ public class TimerActivity extends AppCompatActivity {
         }
 
         String trainData = "";
-        if (trainingSetNumber < trainingSets) {
+        if (trainingSetNumber <= trainingSets) {
             trainData = String.format("\n%s %d : %d %s",
                     getResources().getString(R.string.group_number),
                     trainingSetNumber,
@@ -147,6 +177,35 @@ public class TimerActivity extends AppCompatActivity {
             gifImageView.setImageResource(R.drawable.dynamic_push_ups);
         else
             gifImageView.setImageResource(R.drawable.dynamic_squat);
+    }
+
+    //send completed exercise data to server
+    private void sendCompletedResult(String exerciseName, int exerciseCount, int exerciseDuration) {
+        if (apiInterface == null)
+            return;
+
+        Call<RecordResponse> call = apiInterface.sendFinishedTrainingData("Bearer " + getApiToken(this),
+                exerciseName,
+                exerciseCount,
+                exerciseDuration);
+
+        call.enqueue(new Callback<RecordResponse>() {
+            @Override
+            public void onResponse(Call<RecordResponse> call, Response<RecordResponse> response) {
+                if (response.body() == null)
+                    return;
+
+                //this toast for test only
+                Toast.makeText(TimerActivity.this,
+                        response.body().getMessage().toString()
+                        , Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(Call<RecordResponse> call, Throwable t) {
+                Toast.makeText(TimerActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

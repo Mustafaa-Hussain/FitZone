@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,15 +20,11 @@ import com.example.fitzone.activites.DayActivity;
 import com.example.fitzone.activites.R;
 import com.example.fitzone.recycleViewAdapters.RecycleViewAdapterForDaysPrograms;
 import com.example.fitzone.retrofit_requists.ApiInterface;
-import com.example.fitzone.retrofit_requists.data_models.program_routine_responce.ProgramRoutineResponse;
-import com.example.fitzone.retrofit_requists.data_models.programs.ProgramsResponse;
+import com.example.fitzone.retrofit_requists.data_models.program_routine.ProgramRoutineResponse;
 import com.example.fitzone.retrofit_requists.data_models.programs.ProgramsResponseItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-
-import java.io.Serializable;
-import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;

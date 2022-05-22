@@ -1,6 +1,7 @@
 package com.example.fitzone.activites;
 
 import static com.example.fitzone.common_functions.StaticFunctions.getApiToken;
+import static com.example.fitzone.common_functions.StaticFunctions.getBaseUrl;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,11 +12,22 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.fitzone.handelers.HandleRequests;
+import com.example.fitzone.retrofit_requists.ApiInterface;
+import com.example.fitzone.retrofit_requists.data_models.user_profile_data.UserProfileResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class MainActivity extends AppCompatActivity {
+
+    private Retrofit retrofit;
+    private ApiInterface apiInterface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,16 +41,24 @@ public class MainActivity extends AppCompatActivity {
             StrictMode.setThreadPolicy(policy);
         }
 
-
         //very important step
         //set default ip and port in SharedPreferences file
         SharedPreferences serverDataFile = getSharedPreferences("ipAndPort", MODE_PRIVATE);
         SharedPreferences.Editor editor = serverDataFile.edit();
-        editor.putString("ip", serverDataFile.getString("ip", "192.168.1.3"));//default value
+        editor.putString("ip", serverDataFile.getString("ip", "192.168.1.2"));//default value
         editor.putString("port", serverDataFile.getString("port", "8000"));
         editor.apply();
 
         String apiToken = getApiToken(this);
+
+
+        //retrofit builder
+        retrofit = new Retrofit.Builder()
+                .baseUrl(getBaseUrl(this))
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        apiInterface = retrofit.create(ApiInterface.class);
+
 
         if (apiToken.equals("")) {
             Intent intent;
@@ -46,33 +66,44 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         } else {
-            HandleRequests handleRequests = new HandleRequests(MainActivity.this);
-            handleRequests.getUserProfile(apiToken, (status, jsonObject) -> {
-                Intent localIntent;
-                //user role 0->for regular user and 2->for admin user
-                if (status) {
-                    int role = 0;
-                    try {
-                        role = jsonObject.getInt("role");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
 
-                    localIntent = new Intent(MainActivity.this, HomeActivity.class);
-                    // pass role integer to HomeActivity to identify user type
-
-                    // 0->for regular user
-                    Toast.makeText(this, "role: " + role, Toast.LENGTH_SHORT).show();
-
-                    // 2->for admin user
-                    // and there is identification by apiToken
-                    localIntent.putExtra("role", role);
-                } else {
-                    localIntent = new Intent(MainActivity.this, Reconnect.class);
-                }
-                startActivity(localIntent);
-                finish();
-            });
+            getUserProfile();
         }
+    }
+
+    //get user profile
+    private void getUserProfile() {
+        if (apiInterface == null)
+            return;
+
+        Call<UserProfileResponse> call = apiInterface.getUserProfileData("Bearer " + getApiToken(this));
+        call.enqueue(new Callback<UserProfileResponse>() {
+            @Override
+            public void onResponse(Call<UserProfileResponse> call, Response<UserProfileResponse> response) {
+                if (response.body() == null)
+                    return;
+
+
+                int role = response.body().getRole();
+
+                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+
+                //this for test
+                Toast.makeText(MainActivity.this, "role: " + role, Toast.LENGTH_SHORT).show();
+
+                // 2->for admin user
+                // and there is identification by apiToken
+                intent.putExtra("role", role);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onFailure(Call<UserProfileResponse> call, Throwable t) {
+                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, Reconnect.class);
+                startActivity(intent);
+            }
+        });
     }
 }
