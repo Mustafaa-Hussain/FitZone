@@ -274,7 +274,6 @@ public class PoseDetectorProcessor
 
             @Override
             public void onFailure(Call<ChalengeByIdResponse> call, Throwable t) {
-                Log.d("poseDetector", t.getMessage());
             }
         });
     }
