@@ -63,7 +63,7 @@
                     app:cardCornerRadius="25dp"
                     app:cardBackgroundColor="@color/achievement_post_yellow"
                     android:layout_marginTop="10dp"
-                    android:visibility="visible">
+                    android:visibility="gone">
                     <RatingBar
                         android:id="@+id/rating_bar_post_rating"
                         android:layout_width="match_parent"

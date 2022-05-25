@@ -90,7 +90,7 @@ public class PoseClassifierProcessor {
     }
     poseClassifier = new PoseClassifier(poseSamples);
     if (isStreamMode) {
-      if(trainingName.equals(context.getResources().getString(R.string.push_ups)))
+      if(trainingName.equals("push up"))
         repCounters.add(new RepetitionCounter(POSE_CLASSES[0]));
       else //Squat case
         repCounters.add(new RepetitionCounter(POSE_CLASSES[1]));

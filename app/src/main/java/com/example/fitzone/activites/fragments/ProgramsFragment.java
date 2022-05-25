@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.fitzone.activites.R;
+import com.example.fitzone.activites.fragments.home_activity_fragments.TrainingFragment;
 import com.example.fitzone.recycleViewAdapters.ProgramsAdapter;
 import com.example.fitzone.retrofit_requists.ApiInterface;
 import com.example.fitzone.retrofit_requists.data_models.programs.ProgramsResponse;

@@ -14,8 +14,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.fitzone.handelers.HandleRequests;
 import com.example.fitzone.retrofit_requists.ApiInterface;
 import com.example.fitzone.retrofit_requists.data_models.register.RegisterResponse;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,6 +45,7 @@ public class RegisterActivity extends AppCompatActivity {
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
         vPassword = findViewById(R.id.vPassword);
+        signupB = findViewById(R.id.signup_button);
 
         //retrofit builder
         Retrofit retrofit = new Retrofit.Builder()
@@ -49,8 +54,6 @@ public class RegisterActivity extends AppCompatActivity {
                 .build();
 
         apiInterface = retrofit.create(ApiInterface.class);
-
-        signupB = findViewById(R.id.signup_button);
         signupB.setOnClickListener(this::signup);
 
     }
@@ -123,12 +126,12 @@ public class RegisterActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<RegisterResponse> call, Throwable t) {
                     if (!t.getMessage().isEmpty())
-                        Toast.makeText(RegisterActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RegisterActivity.this, "this username or email is taken", Toast.LENGTH_SHORT).show();
                 }
             });
         }
 
-        //old version using volley
+//        //old version using volley
 //        if (verification()) {
 //            //for test
 ////            emptyAllFields();

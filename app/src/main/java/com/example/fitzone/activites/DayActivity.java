@@ -2,10 +2,12 @@ package com.example.fitzone.activites;
 
 import static com.example.fitzone.common_functions.StaticFunctions.getApiToken;
 import static com.example.fitzone.common_functions.StaticFunctions.getBaseUrl;
+import static com.example.fitzone.common_functions.StaticFunctions.storeDayData;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,14 +20,13 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.fitzone.recycleViewAdapters.RecycleViewAdapterForProgram;
+import com.example.fitzone.recycleViewAdapters.ProgramAdapter;
 import com.example.fitzone.retrofit_requists.ApiInterface;
 import com.example.fitzone.retrofit_requists.data_models.day_training_program.DayTrainingProgram;
 import com.example.fitzone.retrofit_requists.data_models.exercise_data.ExerciseData;
@@ -37,9 +38,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class DayActivity extends AppCompatActivity implements RecycleViewAdapterForProgram.ItemClickListener {
+public class DayActivity extends AppCompatActivity implements ProgramAdapter.ItemClickListener {
 
-    private RecycleViewAdapterForProgram adapter;
+    private ProgramAdapter adapter;
     private DayTrainingProgram myTraining;
     private RecyclerView recyclerView;
     private Retrofit retrofit;
@@ -78,7 +79,7 @@ public class DayActivity extends AppCompatActivity implements RecycleViewAdapter
 
                 recyclerView = findViewById(R.id.recycleView);
                 recyclerView.setLayoutManager(new LinearLayoutManager(DayActivity.this));
-                adapter = new RecycleViewAdapterForProgram(DayActivity.this, myTraining);
+                adapter = new ProgramAdapter(DayActivity.this, myTraining);
                 adapter.setClickListener(DayActivity.this);
                 recyclerView.setAdapter(adapter);
             }
@@ -183,6 +184,10 @@ public class DayActivity extends AppCompatActivity implements RecycleViewAdapter
                     intent.putExtra("TReps", myTraining.get(position).getReps());
                     intent.putExtra("TSets", myTraining.get(position).getSets());
                     intent.putExtra("setNumber", 1);
+
+                    storeDayData(DayActivity.this,
+                            myTraining.get(position).getExercise_name(),
+                            myTraining.get(position).getDay());
 
                     checkPermission(intent);
                 });

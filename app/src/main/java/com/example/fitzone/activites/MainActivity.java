@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         } else {
-
             getUserProfile();
         }
     }
@@ -80,16 +79,16 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<UserProfileResponse>() {
             @Override
             public void onResponse(Call<UserProfileResponse> call, Response<UserProfileResponse> response) {
-                if (response.body() == null)
+                if (response.body() == null) {
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
                     return;
-
+                }
 
                 int role = response.body().getRole();
 
                 Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-
-                //this for test
-                Toast.makeText(MainActivity.this, "role: " + role, Toast.LENGTH_SHORT).show();
 
                 // 2->for admin user
                 // and there is identification by apiToken
@@ -103,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, Reconnect.class);
                 startActivity(intent);
+                finish();
             }
         });
     }

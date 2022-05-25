@@ -1,4 +1,4 @@
-package com.example.fitzone.activites.fragments;
+package com.example.fitzone.activites.fragments.home_activity_fragments;
 
 import static com.example.fitzone.common_functions.StaticFunctions.getApiToken;
 import static com.example.fitzone.common_functions.StaticFunctions.getBaseUrl;
@@ -16,11 +16,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.fitzone.activites.R;
+import com.example.fitzone.activites.fragments.BadgesMoreInfo;
 import com.example.fitzone.recycleViewAdapters.BadgesAdapter;
 import com.example.fitzone.recycleViewAdapters.MyBadgesAdapter;
 import com.example.fitzone.retrofit_requists.ApiInterface;
 import com.example.fitzone.retrofit_requists.data_models.badges.BadgesResponse;
-import com.example.fitzone.retrofit_requists.data_models.badges.DataModelBadgesResponseItem;
 import com.example.fitzone.retrofit_requists.data_models.user_profile_data.Badge;
 import com.example.fitzone.retrofit_requists.data_models.user_profile_data.UserProfileResponse;
 import com.google.android.material.tabs.TabLayout;
@@ -61,7 +61,6 @@ public class BadgesFragment extends Fragment implements BadgesAdapter.ItemClickL
         //set layout manager to recycler View
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
 
-
         //builder
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(getBaseUrl(getActivity()))
@@ -72,17 +71,17 @@ public class BadgesFragment extends Fragment implements BadgesAdapter.ItemClickL
 
         //set swipe Refresh is true
         swipeRefreshLayout.setRefreshing(true);
-        getCurrentBadges(tabLayout.getTabAt(tabLayout.getSelectedTabPosition()));
+        getCurrentBadgesTab(tabLayout.getTabAt(tabLayout.getSelectedTabPosition()));
 
         //get all badges and pass it to recycler view adapter
         swipeRefreshLayout.setOnRefreshListener(() ->
-                getCurrentBadges(tabLayout.getTabAt(tabLayout.getSelectedTabPosition())));
+                getCurrentBadgesTab(tabLayout.getTabAt(tabLayout.getSelectedTabPosition())));
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
 
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                getCurrentBadges(tab);
+                getCurrentBadgesTab(tab);
             }
 
             @SuppressLint("NotifyDataSetChanged")
@@ -137,7 +136,7 @@ public class BadgesFragment extends Fragment implements BadgesAdapter.ItemClickL
     }
 
     //get current badges
-    private void getCurrentBadges(TabLayout.Tab tab) {
+    private void getCurrentBadgesTab(TabLayout.Tab tab) {
         if (tab.getText().equals(getString(R.string.my_badges)))
             getMyBadges();
         else if (tab.getText().equals(getString(R.string.all_badges)))

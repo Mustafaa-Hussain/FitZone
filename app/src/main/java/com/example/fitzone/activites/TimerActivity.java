@@ -2,6 +2,7 @@ package com.example.fitzone.activites;
 
 import static com.example.fitzone.common_functions.StaticFunctions.getApiToken;
 import static com.example.fitzone.common_functions.StaticFunctions.getBaseUrl;
+import static com.example.fitzone.common_functions.StaticFunctions.getDayData;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -94,7 +95,6 @@ public class TimerActivity extends AppCompatActivity {
         finish();
     }
 
-
     @SuppressLint({"SetTextI18n", "DefaultLocale"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,9 +171,9 @@ public class TimerActivity extends AppCompatActivity {
         GifImageView gifImageView = findViewById(R.id.training_gif_file);
 
         //check and assign image to each training
-        if (trainingName.equals(getString(R.string.squat)))
+        if (trainingName.equals("squat"))
             gifImageView.setImageResource(R.drawable.dynamic_squat);
-        else if (trainingName.equals(getString(R.string.push_ups)))
+        else if (trainingName.equals("push up"))
             gifImageView.setImageResource(R.drawable.dynamic_push_ups);
         else
             gifImageView.setImageResource(R.drawable.dynamic_squat);
@@ -195,10 +195,9 @@ public class TimerActivity extends AppCompatActivity {
                 if (response.body() == null)
                     return;
 
-                //this toast for test only
-                Toast.makeText(TimerActivity.this,
-                        response.body().getMessage().toString()
-                        , Toast.LENGTH_LONG).show();
+                askToShareOrNot(trainingName,
+                        String.format("%d X %d " + getString(R.string.in) + " %d " + getString(R.string.seconds), trainingReps, trainingSets, lastTime),
+                        findViewById(R.id.timer_main_view));
             }
 
             @Override
@@ -244,7 +243,7 @@ public class TimerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                String apiToken = getSharedPreferences("UserData", MODE_PRIVATE).getString("apiToken", null);
+                String apiToken = getApiToken(TimerActivity.this);
                 HandleRequests handleRequests = new HandleRequests(TimerActivity.this);
 
                 int postType = 1;//for training not regular post
@@ -253,10 +252,7 @@ public class TimerActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(boolean status, JSONObject jsonObject) {
                                 if (status) {
-                                    Intent intent;
-                                    intent = new Intent(TimerActivity.this, DayActivity.class);
-                                    intent.putExtra("day", caption);
-                                    startActivity(intent);
+                                    finish();
 
                                     askPopup.dismiss();
                                 } else {
@@ -272,11 +268,8 @@ public class TimerActivity extends AppCompatActivity {
         no.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent;
-                intent = new Intent(TimerActivity.this, DayActivity.class);
-                intent.putExtra("day", caption);
-                startActivity(intent);
                 askPopup.dismiss();
+                finish();
             }
         });
 

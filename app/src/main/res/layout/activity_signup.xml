@@ -1,33 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RegisterActivity"
     android:background="@drawable/login_bk"
-    android:focusableInTouchMode="true">
+    android:focusableInTouchMode="true"
+    tools:context=".RegisterActivity">
 
-    <LinearLayout android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="8dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        xmlns:android="http://schemas.android.com/apk/res/android">
+        app:layout_constraintTop_toTopOf="parent">
+
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             style="@style/loginHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/loginViewsMargin"
             android:text="@string/register"
-            android:layout_marginTop="@dimen/loginViewsMargin"/>
+            android:textAlignment="center" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputName"
@@ -84,19 +85,19 @@
         <Button
             android:id="@+id/signup_button"
             style="@style/loginButton"
-            android:text="@string/action_sign_up"
             android:layout_gravity="right"
             android:layout_marginTop="@dimen/loginViewsMargin"
-            android:textAllCaps="false"/>
+            android:text="@string/action_sign_up"
+            android:textAllCaps="false" />
 
         <TextView
             style="@style/parent"
-            android:textStyle="bold"
-            android:textColor="@color/primaryTextColor"
-            android:text="@string/backToLogin"
             android:layout_marginTop="@dimen/loginViewsMargin"
             android:onClick="backToLogin"
-            android:padding="5dp"/>
+            android:padding="5dp"
+            android:text="@string/backToLogin"
+            android:textColor="@color/primaryTextColor"
+            android:textStyle="bold" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,23 +1,18 @@
 package com.example.fitzone.recycleViewAdapters;
 
-import static com.example.fitzone.common_functions.StaticFunctions.getApiToken;
 import static com.example.fitzone.common_functions.StaticFunctions.getBaseUrl;
 import static com.example.fitzone.common_functions.StaticFunctions.getHostUrl;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.VideoView;
 
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,25 +20,21 @@ import com.bumptech.glide.Glide;
 import com.example.fitzone.activites.R;
 import com.example.fitzone.handelers.HandlePost;
 import com.example.fitzone.retrofit_requists.ApiInterface;
-import com.example.fitzone.retrofit_requists.data_models.user_data.UserDataResponse;
 import com.example.fitzone.retrofit_requists.data_models.user_profile_data.Post;
 
 import java.util.HashMap;
 import java.util.List;
 
 import cn.jzvd.JzvdStd;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ProfilePostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<Post> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
-    private HandlePost handlePost;
+    private HandlePost profilePost;
     private Activity activity;
 
     private HashMap<String, Integer> userLevelWithTag = new HashMap<>();
@@ -54,7 +45,7 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
     Integer[] colors;
 
     // data is passed into the constructor
-    public RecycleViewAdapterForPosts(Activity activity, List<Post> arrayOfPosts) {
+    public ProfilePostsAdapter(Activity activity, List<Post> arrayOfPosts) {
         if (activity == null)
             return;
 
@@ -100,29 +91,8 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
         }
     }
 
-    //get user level
-    private void getUserLevel(String username, String tag) {
-        if (apiInterface == null)
-            return;
-
-        Call<UserDataResponse> call = apiInterface.getUserData("Bearer " + getApiToken(activity), username);
-        call.enqueue(new Callback<UserDataResponse>() {
-            @Override
-            public void onResponse(Call<UserDataResponse> call, Response<UserDataResponse> response) {
-                if (response.body() == null)
-                    return;
-                userLevelWithTag.put(tag, response.body().getLevel());
-                userLevel.setValue(userLevelWithTag);
-            }
-
-            @Override
-            public void onFailure(Call<UserDataResponse> call, Throwable t) {
-                Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     // binds the data to the TextView in each row
+    @SuppressLint("ResourceType")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         Post post = mData.get(position);
@@ -132,10 +102,7 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
                 ViewHolderBasic viewHolderBasic = (ViewHolderBasic) holder;
                 viewHolderBasic.username.setText(post.getUsername());
 
-                getUserLevel(post.getUsername(), String.valueOf(post.getId()));
-                userLevel.observe((LifecycleOwner) activity, level -> {
-                    viewHolderBasic.level.append(" " + level.get(String.valueOf(mData.get(position).getId())));
-                });
+                viewHolderBasic.level.setText("");
 
                 //fill avatar image
                 Glide.with(activity)
@@ -155,20 +122,16 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
                 //to handle post by it's id
                 viewHolderBasic.like.setHint(String.valueOf(post.getLiked()));
 
-                handlePost = new HandlePost(activity);
-                handlePost.setPostData(post);
+                profilePost = new HandlePost(activity);
 
-                handlePost.setLikeButtonState(viewHolderBasic.like, post.getId());
+                profilePost.setLikeButtonState(viewHolderBasic.like, post.getLiked());
 
                 break;
             case 1://this case for rating post
                 ViewHolderRating viewHolderRating = (ViewHolderRating) holder;
                 viewHolderRating.username.setText(post.getUsername());
 
-                getUserLevel(post.getUsername(), String.valueOf(post.getId()));
-                userLevel.observe((LifecycleOwner) activity, level -> {
-                    viewHolderRating.level.append(" " + level.get(String.valueOf(mData.get(position).getId())));
-                });
+                viewHolderRating.level.setText("");
 
                 //fill avatar image
                 Glide.with(activity)
@@ -188,20 +151,18 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
                 //to handle post by it's id
                 viewHolderRating.like.setHint(String.valueOf(post.getLiked()));
 
-                handlePost = new HandlePost(activity);
-                handlePost.setPostData(post);
+                profilePost = new HandlePost(activity);
 
-                handlePost.setLikeButtonState(viewHolderRating.like, post.getId());
+                profilePost.setLikeButtonState(viewHolderRating.like, post.getLiked());
 
                 break;
             case 2://this case for image post
                 ViewHolderImage viewHolderImage = (ViewHolderImage) holder;
                 viewHolderImage.username.setText(post.getUsername());
 
-                getUserLevel(post.getUsername(), String.valueOf(post.getId()));
-                userLevel.observe((LifecycleOwner) activity, level -> {
-                    viewHolderImage.level.append(" " + level.get(String.valueOf(mData.get(position).getId())));
-                });
+                viewHolderImage.level.setText("");
+
+                viewHolderImage.level.setText("");
 
                 //fill avatar image
                 Glide.with(activity)
@@ -213,7 +174,15 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
 
                 viewHolderImage.initDate.setText(post.getCreated_at().substring(0, post.getCreated_at().indexOf('T')));
                 viewHolderImage.caption.setText(post.getCaption());
-                viewHolderImage.content.setText(post.getContent());
+
+                viewHolderImage.content.setVisibility(View.GONE);
+
+                //fill post image
+                Glide.with(activity)
+                        .load(getHostUrl(activity) + post.getContent())
+                        .centerCrop()
+                        .placeholder(R.drawable.loading_spinner)
+                        .into(viewHolderImage.postImage);
 
                 viewHolderImage.noOfLikes.setText(String.valueOf(post.getNumber_of_comments()));
                 viewHolderImage.noOfComments.setText(String.valueOf(post.getNumber_of_comments()));
@@ -221,20 +190,16 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
                 //to handle post by it's id
                 viewHolderImage.like.setHint(String.valueOf(post.getLiked()));
 
-                handlePost = new HandlePost(activity);
-                handlePost.setPostData(post);
+                profilePost = new HandlePost(activity);
 
-                handlePost.setLikeButtonState(viewHolderImage.like, post.getId());
+                profilePost.setLikeButtonState(viewHolderImage.like, post.getLiked());
 
                 break;
             case 3://this case for video post
                 ViewHolderVideo viewHolderVideo = (ViewHolderVideo) holder;
                 viewHolderVideo.username.setText(post.getUsername());
 
-                getUserLevel(post.getUsername(), String.valueOf(post.getId()));
-                userLevel.observe((LifecycleOwner) activity, level -> {
-                    viewHolderVideo.level.append(" " + level.get(String.valueOf(mData.get(position).getId())));
-                });
+                viewHolderVideo.level.setText("");
 
                 //fill avatar image
                 Glide.with(activity)
@@ -246,7 +211,12 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
 
                 viewHolderVideo.initDate.setText(post.getCreated_at().substring(0, post.getCreated_at().indexOf('T')));
                 viewHolderVideo.caption.setText(post.getCaption());
-                viewHolderVideo.content.setText(post.getContent());
+
+                viewHolderVideo.content.setVisibility(View.GONE);
+
+                viewHolderVideo.postVideo.setUp(getHostUrl(activity) + post.getContent(), post.getCaption());
+                viewHolderVideo.postVideo.posterImageView.setImageDrawable(activity.getDrawable(R.drawable._1_train_hard));
+
 
                 viewHolderVideo.noOfLikes.setText(String.valueOf(post.getNumber_of_likes()));
                 viewHolderVideo.noOfComments.setText(String.valueOf(post.getNumber_of_comments()));
@@ -254,15 +224,12 @@ public class RecycleViewAdapterForPosts extends RecyclerView.Adapter<RecyclerVie
                 //to handle post by it's id
                 viewHolderVideo.like.setHint(String.valueOf(post.getLiked()));
 
-                handlePost = new HandlePost(activity);
-                handlePost.setPostData(post);
+                profilePost = new HandlePost(activity);
 
-                handlePost.setLikeButtonState(viewHolderVideo.like, post.getId());
+                profilePost.setLikeButtonState(viewHolderVideo.like, post.getLiked());
 
                 //set video to video view
                 viewHolderVideo.postVideo.setUp(getHostUrl(activity) + post.getContent(), "");
-                viewHolderVideo.postVideo.posterImageView.setImageDrawable(activity.getDrawable(R.drawable.static_squat));
-
                 break;
             default:
                 break;

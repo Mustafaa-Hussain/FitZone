@@ -1,4 +1,4 @@
-package com.example.fitzone.activites.fragments;
+package com.example.fitzone.activites.fragments.home_activity_fragments;
 
 import static com.example.fitzone.common_functions.StaticFunctions.getApiToken;
 import static com.example.fitzone.common_functions.StaticFunctions.getBaseUrl;
@@ -18,7 +18,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.fitzone.activites.DayActivity;
 import com.example.fitzone.activites.R;
-import com.example.fitzone.recycleViewAdapters.RecycleViewAdapterForDaysPrograms;
+import com.example.fitzone.recycleViewAdapters.DaysProgramsAdapter;
 import com.example.fitzone.retrofit_requists.ApiInterface;
 import com.example.fitzone.retrofit_requists.data_models.program_routine.ProgramRoutineResponse;
 import com.example.fitzone.retrofit_requists.data_models.programs.ProgramsResponseItem;
@@ -32,9 +32,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class TrainingFragment extends Fragment implements RecycleViewAdapterForDaysPrograms.ItemClickListener {
+public class TrainingFragment extends Fragment implements DaysProgramsAdapter.ItemClickListener {
 
-    private RecycleViewAdapterForDaysPrograms adapter;
+    private DaysProgramsAdapter adapter;
     private RecyclerView recyclerView;
     private final ProgramsResponseItem programData;
     private Retrofit retrofit;
@@ -90,7 +90,7 @@ public class TrainingFragment extends Fragment implements RecycleViewAdapterForD
                 myDays.put("Day: " + daysData.get3().get(0).getDay());
                 myDays.put("Day: " + daysData.get5().get(0).getDay());
 
-                adapter = new RecycleViewAdapterForDaysPrograms(getActivity(), myDays);
+                adapter = new DaysProgramsAdapter(getActivity(), myDays);
                 adapter.setClickListener(TrainingFragment.this);
                 recyclerView.setAdapter(adapter);
 

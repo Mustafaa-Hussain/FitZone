@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.HomeFragment">
+    tools:context=".fragments.home_activity_fragments.HomeFragment">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/profile_swipe_refresh"
@@ -37,14 +37,30 @@
                     android:layout_marginBottom="15dp"
                     android:src="@drawable/def_profile_image" />
 
-                <TextView
-                    android:id="@+id/userName"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/username"
-                    android:textColor="@color/black"
-                    android:textSize="25dp" />
+                    android:background="@color/semi_white"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/userName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/username"
+                        android:textColor="@color/black"
+                        android:textSize="25dp" />
+
+                    <TextView
+                        android:id="@+id/user_level"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/level"
+                        android:textColor="@color/blue" />
+                </LinearLayout>
+
 
                 <LinearLayout
                     android:layout_width="match_parent"

@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:text="@string/like"
             android:drawableStart="@drawable/plus_one"
-            android:paddingStart="10dp"
+            android:paddingStart="15dp"
             android:hint="like"
             android:textAllCaps="false"/>
 

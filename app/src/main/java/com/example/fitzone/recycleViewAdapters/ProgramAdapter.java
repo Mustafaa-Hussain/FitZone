@@ -18,9 +18,8 @@ import com.example.fitzone.retrofit_requists.data_models.day_training_program.Da
 import com.example.fitzone.retrofit_requists.data_models.day_training_program.DayTrainingProgramItem;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
-public class RecycleViewAdapterForProgram extends RecyclerView.Adapter<RecycleViewAdapterForProgram.ViewHolder> {
+public class ProgramAdapter extends RecyclerView.Adapter<ProgramAdapter.ViewHolder> {
 
     private DayTrainingProgram myData;
     private LayoutInflater mInflater;
@@ -28,7 +27,7 @@ public class RecycleViewAdapterForProgram extends RecyclerView.Adapter<RecycleVi
     private Activity activity;
 
     // data is passed into the constructor
-    public RecycleViewAdapterForProgram(Activity activity, DayTrainingProgram arrayOfPrograms) {
+    public ProgramAdapter(Activity activity, DayTrainingProgram arrayOfPrograms) {
         if (activity == null)
             return;
 

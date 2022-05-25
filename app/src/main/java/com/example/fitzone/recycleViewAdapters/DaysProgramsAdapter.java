@@ -17,18 +17,17 @@ import com.example.fitzone.activites.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-public class RecycleViewAdapterForDaysPrograms extends RecyclerView.Adapter<RecycleViewAdapterForDaysPrograms.ViewHolder> {
+public class DaysProgramsAdapter extends RecyclerView.Adapter<DaysProgramsAdapter.ViewHolder> {
 
     private JSONArray mData;
     private LayoutInflater mInflater;
     Activity activity;
-    private RecycleViewAdapterForDaysPrograms.ItemClickListener mClickListener;
+    private DaysProgramsAdapter.ItemClickListener mClickListener;
 
 
     // data is passed into the constructor
-    public RecycleViewAdapterForDaysPrograms(Activity activity, JSONArray arrayOfDays) {
+    public DaysProgramsAdapter(Activity activity, JSONArray arrayOfDays) {
         if (activity == null)
             return;
 

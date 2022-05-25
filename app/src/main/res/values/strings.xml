@@ -235,4 +235,11 @@
     <string name="my_badges">My Badges</string>
     <string name="all_badges">All Badges</string>
     <string name="level">Level</string>
+    <string name="image_post">Image</string>
+    <string name="video_post">Video</string>
+    <string name="text_post">Text</string>
+    <string name="select_video">Select Video</string>
+    <string name="competition">Competitions</string>
+    <string name="create_competition">Create Competition</string>
+    <string name="number">Number</string>
 </resources>

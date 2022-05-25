@@ -16,24 +16,37 @@
 
 package com.example.fitzone.vision.posedetector;
 
+import static com.example.fitzone.common_functions.StaticFunctions.getApiToken;
+import static com.example.fitzone.common_functions.StaticFunctions.getBaseUrl;
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 
+import com.example.fitzone.activites.HomeActivity;
 import com.example.fitzone.activites.R;
 import com.example.fitzone.activites.TimerActivity;
-import com.google.android.gms.tasks.Task;
-import com.google.android.odml.image.MlImage;
-import com.google.mlkit.vision.common.InputImage;
+import com.example.fitzone.common_functions.StaticFunctions;
+import com.example.fitzone.retrofit_requists.ApiInterface;
+import com.example.fitzone.retrofit_requists.data_models.get_challenge_by_id.ChalengeByIdResponse;
+import com.example.fitzone.retrofit_requists.data_models.increament_reps_by_one.IncrementRepsByOne;
 import com.example.fitzone.vision.GraphicOverlay;
 import com.example.fitzone.vision.VisionProcessorBase;
 import com.example.fitzone.vision.posedetector.classification.PoseClassifierProcessor;
+import com.google.android.gms.tasks.Task;
+import com.google.android.odml.image.MlImage;
+import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.pose.Pose;
 import com.google.mlkit.vision.pose.PoseDetection;
 import com.google.mlkit.vision.pose.PoseDetector;
@@ -43,6 +56,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * A processor to run pose detector.
@@ -66,13 +85,24 @@ public class PoseDetectorProcessor
     private long startTime;
     private long endTime;
 
-    //training data to focuse on it
+    //training data to focus on it
 
     private final String trainingName;
     private final Integer trainingReps;
     private final Integer trainingSets;
     private Integer trainingSetNumber;
     private final Integer lastTime;
+    private final Integer challengeId;
+
+    private String opponentName;
+    private Integer opponentScore;
+
+    private Retrofit retrofit;
+    private ApiInterface apiInterfaceListener;
+    private ApiInterface apiInterfaceSender;
+    private Call<ChalengeByIdResponse> call;
+
+    private boolean status;
 
     private PoseClassifierProcessor poseClassifierProcessor;
 
@@ -109,7 +139,8 @@ public class PoseDetectorProcessor
             Integer trainingReps,
             Integer trainingSets,
             Integer trainingSetNumber,
-            Integer lastTime) {
+            Integer lastTime,
+            Integer challengeId) {
 
         super(activity);
         this.showInFrameLikelihood = showInFrameLikelihood;
@@ -128,15 +159,55 @@ public class PoseDetectorProcessor
         this.trainingSetNumber = trainingSetNumber;
         this.lastTime = lastTime;
 
+        this.challengeId = challengeId;
+
+        opponentName = "";
+        opponentScore = 0;
+        status = false;
 
         //store beginning time after perform single train
         startTime = System.currentTimeMillis();
+
+        //retrofit builder
+        retrofit = new Retrofit.Builder()
+                .baseUrl(getBaseUrl(activity))
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        apiInterfaceListener = retrofit.create(ApiInterface.class);
+        apiInterfaceSender = retrofit.create(ApiInterface.class);
+
+        if (challengeId != 0)
+            ((CardView) activity.findViewById(R.id.opponent_data)).setVisibility(View.VISIBLE);
+        runToListenAllTheTime();
     }
+
+
+    private Handler timerHandler = new Handler();
+    private Runnable timerRunnable = null;
+
+    //timer that take a time and wait for it
+    private void runToListenAllTheTime() {
+        timerRunnable = new Runnable() {
+            final long startTime = System.currentTimeMillis();
+
+            @SuppressLint({"DefaultLocale", "SetTextI18n"})
+            @Override
+            public void run() {
+                //listen to show status changes or not
+                listen();
+                timerHandler.postDelayed(this, 2000);
+            }
+        };
+        timerHandler.postDelayed(timerRunnable, 0);
+    }
+
 
     @Override
     public void stop() {
         super.stop();
         detector.close();
+        if (timerRunnable != null)
+            timerHandler.removeCallbacks(timerRunnable);
     }
 
     @Override
@@ -181,6 +252,36 @@ public class PoseDetectorProcessor
 
     private int doneNO = 0;
 
+    //listen to any opponent
+    private void listen() {
+        if (apiInterfaceListener == null)
+            return;
+
+        call = apiInterfaceListener.getChallengeById("Bearer " + getApiToken(activity), challengeId);
+        call.enqueue(new Callback<ChalengeByIdResponse>() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onResponse(Call<ChalengeByIdResponse> call, Response<ChalengeByIdResponse> response) {
+                if (response.body() == null)
+                    return;
+                opponentName = response.body().getOpponent_name();
+                opponentScore = response.body().getOpponent_score();
+
+                ((TextView) activity.findViewById(R.id.tx_v_opponent_name)).setText("Opponent Name: " + opponentName);
+                ((TextView) activity.findViewById(R.id.tx_v_opponent_score)).setText("Opponent Score: " + opponentScore);
+
+            }
+
+            @Override
+            public void onFailure(Call<ChalengeByIdResponse> call, Throwable t) {
+                Log.d("poseDetector", t.getMessage());
+            }
+        });
+    }
+
+    private int noOfTrains = 0;
+
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onSuccess(
             @NonNull PoseWithClassification poseWithClassification,
@@ -188,10 +289,9 @@ public class PoseDetectorProcessor
 
         List<String> result = poseWithClassification.classificationResult;
 
-        if (!result.isEmpty())
+        if (!result.isEmpty()) {
             ((TextView) activity.findViewById(R.id.tx_v_vision_live)).setText(result.get(0));
-
-        int noOfTrains = 0;
+        }
 
         if (result.isEmpty())
             return;
@@ -200,6 +300,7 @@ public class PoseDetectorProcessor
             try {
                 noOfTrains = Integer.parseInt(result.get(0).substring(result.get(0).indexOf(':') + 2,
                         result.get(0).indexOf("reps") - 1));
+                sendNewRepOne(noOfTrains);
             } catch (Exception e) {
                 Log.d(TAG, e.getMessage());
             }
@@ -225,6 +326,42 @@ public class PoseDetectorProcessor
                         poseWithClassification.classificationResult));
     }
 
+    private void sendNewRepOne(int noOfTrains) {
+        if (apiInterfaceSender == null)
+            return;
+
+        if (noOfTrains > StaticFunctions.oldData) {
+            StaticFunctions.oldData = noOfTrains;
+            Call<IncrementRepsByOne> call = apiInterfaceSender.incrementRepsByOne(
+                    "Bearer " + getApiToken(activity),
+                    challengeId);
+            call.enqueue(new Callback<IncrementRepsByOne>() {
+                @Override
+                public void onResponse(Call<IncrementRepsByOne> call, Response<IncrementRepsByOne> response) {
+                    if (response.body() == null)
+                        return;
+
+                    if (response.body().getState() == 2) {
+                        Toast.makeText(activity, "the winner is: " + response.body().getWinner(), Toast.LENGTH_LONG).show();
+
+
+                        doneNO++;
+                        ToneGenerator tg = new ToneGenerator(AudioManager.AUDIOFOCUS_REQUEST_GRANTED, 100);
+                        tg.startTone(ToneGenerator.TONE_CDMA_ABBR_INTERCEPT);
+                        Intent intent = new Intent(activity, HomeActivity.class);
+                        activity.startActivity(intent);
+                        activity.finish();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<IncrementRepsByOne> call, Throwable t) {
+
+                }
+            });
+        }
+    }
+
     @Override
     protected void onFailure(@NonNull Exception e) {
         Log.e(TAG, "Pose detection failed!", e);
@@ -237,7 +374,6 @@ public class PoseDetectorProcessor
     }
 
     private void goToTimerActivity() {
-
         currentTakenTime = (int) (System.currentTimeMillis() - startTime) / 1000;
 
         Intent intent = new Intent(activity, TimerActivity.class);

@@ -15,7 +15,7 @@
     <string name="download_error" translatable="false">Download error</string>
     <string name="start_over" translatable="false">Start over</string>
     <string name="menu_item_settings" translatable="false">Settings</string>
-    <string name="select_image" translatable="false">Select image</string>
+    <string name="select_image" translatable="false">اختيار صورة</string>
     <string name="custom_object_detection" translatable="false">Custom Object Detector</string>
 
     <!-- Settings related strings. -->
@@ -233,4 +233,11 @@
     <string name="my_badges">جوائزي</string>
     <string name="all_badges">كل الجوائز المتاحة</string>
     <string name="level">المستوى</string>
+    <string name="image_post">صورة</string>
+    <string name="video_post">فيديو</string>
+    <string name="text_post">نص</string>
+    <string name="select_video">إختيار فيديو</string>
+    <string name="competition">مسابقات</string>
+    <string name="create_competition">إنشاء تحدي جديد</string>
+    <string name="number">عدد</string>
 </resources>

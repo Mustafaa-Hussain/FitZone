@@ -5,13 +5,9 @@ import static com.example.fitzone.common_functions.StaticFunctions.getBaseUrl;
 import static com.example.fitzone.common_functions.StaticFunctions.getHostUrl;
 
 import android.app.Activity;
-import android.content.Context;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -25,12 +21,6 @@ import com.bumptech.glide.Glide;
 import com.example.fitzone.activites.R;
 import com.example.fitzone.retrofit_requists.ApiInterface;
 import com.example.fitzone.retrofit_requists.data_models.user_data.UserDataResponse;
-import com.example.fitzone.retrofit_requists.data_models.user_profile_data.UserProfileResponse;
-import com.google.android.gms.auth.api.signin.internal.HashAccumulator;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +31,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class RecycleViewAdapterForFriendRecord extends RecyclerView.Adapter<RecycleViewAdapterForFriendRecord.ViewHolder> {
+public class FriendRecordAdapter extends RecyclerView.Adapter<FriendRecordAdapter.ViewHolder> {
 
     private List<String> mData;
     private LayoutInflater mInflater;
@@ -59,13 +49,13 @@ public class RecycleViewAdapterForFriendRecord extends RecyclerView.Adapter<Recy
     }
 
     // data is passed into the constructor
-    public RecycleViewAdapterForFriendRecord(Activity activity, List<String> arrayOfPosts) {
+    public FriendRecordAdapter(Activity activity, List<String> arrayOfPosts) {
         if (activity == null)
             return;
 
+        this.activity = activity;
         this.mInflater = LayoutInflater.from(activity);
         this.mData = arrayOfPosts;
-        this.activity = activity;
 
         retrofit = new Retrofit.Builder()
                 .baseUrl(getBaseUrl(activity))

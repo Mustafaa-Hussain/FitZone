@@ -1,48 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="10dp"
+    android:layout_margin="5dp"
     android:background="@drawable/custom_rectangle"
     android:gravity="center"
-    android:layout_margin="5dp">
-    <androidx.appcompat.widget.LinearLayoutCompat
+    android:padding="10dp">
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <TextView
-                android:layout_weight="4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="@color/blue"
                 android:id="@+id/username"
-                android:text="@string/username"/>
-            <TextView
-                android:layout_weight="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/default_date"
+                android:layout_weight="4"
                 android:gravity="center"
-                android:id="@+id/initDate"/>
+                android:text="@string/username"
+                android:textColor="@color/blue" />
+
+            <TextView
+                android:id="@+id/initDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/default_date" />
 
         </LinearLayout>
 
         <TextView
+            android:id="@+id/commentContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_margin="5dp"
-            android:id="@+id/commentContent"
-            android:text="@string/comment_content"/>
+            android:gravity="center"
+            android:text="@string/comment_content" />
 
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
-</androidx.cardview.widget.CardView>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

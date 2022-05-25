@@ -5,7 +5,6 @@ import static com.example.fitzone.common_functions.StaticFunctions.getBaseUrl;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -22,22 +21,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.fitzone.activites.fragments.ProfileFragment;
 import com.example.fitzone.handelers.HandleRequests;
 
-import com.example.fitzone.recycleViewAdapters.RecycleViewAdapterForFriendRecord;
+import com.example.fitzone.recycleViewAdapters.FriendRecordAdapter;
 import com.example.fitzone.retrofit_requists.ApiInterface;
 import com.example.fitzone.retrofit_requists.data_models.all_usernames.AllUsernamesResponse;
-import com.example.fitzone.retrofit_requists.data_models.register.UserData;
 import com.example.fitzone.retrofit_requists.data_models.user_data.UserDataResponse;
 import com.example.fitzone.retrofit_requists.data_models.user_profile_data.UserProfileResponse;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Collections;
 import java.util.List;
@@ -48,11 +41,11 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class FriendsPage extends AppCompatActivity implements RecycleViewAdapterForFriendRecord.ItemClickListener {
+public class FriendsPage extends AppCompatActivity implements FriendRecordAdapter.ItemClickListener {
 
     private List<String> allFriends;
 
-    private RecycleViewAdapterForFriendRecord adapter;
+    private FriendRecordAdapter adapter;
     private RecyclerView recyclerView;
 
     private FloatingActionButton searchForNewFriend;
@@ -159,10 +152,7 @@ public class FriendsPage extends AppCompatActivity implements RecycleViewAdapter
             });
         });
     }
-    @Override
-    public void onBackPressed() {
-        //
-    }
+
 
     //get user user data by it's username
     private void getUserDataWithUsername(String username) {
@@ -179,7 +169,7 @@ public class FriendsPage extends AppCompatActivity implements RecycleViewAdapter
                 allShownFriends = Collections.singletonList(response.body().getUsername());
 
                 recyclerView.setLayoutManager(new LinearLayoutManager(FriendsPage.this));
-                adapter = new RecycleViewAdapterForFriendRecord(FriendsPage.this,
+                adapter = new FriendRecordAdapter(FriendsPage.this,
                         Collections.singletonList(response.body().getUsername()));
                 adapter.setClickListener(FriendsPage.this);
                 recyclerView.setAdapter(adapter);
@@ -215,7 +205,7 @@ public class FriendsPage extends AppCompatActivity implements RecycleViewAdapter
                 allFriends = response.body().getUsers();
 
                 recyclerView.setLayoutManager(new LinearLayoutManager(FriendsPage.this));
-                adapter = new RecycleViewAdapterForFriendRecord(FriendsPage.this, allFriends);
+                adapter = new FriendRecordAdapter(FriendsPage.this, allFriends);
 
                 adapter.setClickListener(FriendsPage.this);
 
@@ -248,7 +238,7 @@ public class FriendsPage extends AppCompatActivity implements RecycleViewAdapter
                 myFriends = response.body().getFriends_username();
 
                 recyclerView.setLayoutManager(new LinearLayoutManager(FriendsPage.this));
-                adapter = new RecycleViewAdapterForFriendRecord(FriendsPage.this, myFriends);
+                adapter = new FriendRecordAdapter(FriendsPage.this, myFriends);
 
                 if (myFriends.isEmpty())
                     Snackbar.make(findViewById(R.id.recycleView), "There is no Friends write now", Snackbar.LENGTH_LONG)

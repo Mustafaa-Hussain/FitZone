@@ -6,7 +6,34 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import java.util.HashMap;
+
 public class StaticFunctions {
+
+    public static int oldData = 0;
+
+    //store day data
+    public static void storeDayData(Activity activity, String dayName, int dayNumber) {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("day_data", activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("day_name", dayName);
+        editor.putInt("day_number", dayNumber);
+        editor.apply();
+    }
+
+    //get day data
+    public static HashMap<String, String> getDayData(Activity activity) {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("day_data", activity.MODE_PRIVATE);
+
+        String dayName = sharedPreferences.getString("day_name", "");
+
+        String dayNumber = String.valueOf(sharedPreferences.getInt("day_number", 1));
+
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("day_name", dayName);
+        hashMap.put("day_number", dayNumber);
+        return hashMap;
+    }
 
     //return baser url
     public static String getBaseUrl(Activity activity) {
@@ -41,13 +68,13 @@ public class StaticFunctions {
             editor.apply();
             return true;
         } catch (Exception e) {
-            Log.d("Store api_token" , e.getMessage());
+            Log.d("Store api_token", e.getMessage());
             return false;
         }
     }
 
     //get stored api_token
-    public static String getApiToken(Activity activity){
+    public static String getApiToken(Activity activity) {
         SharedPreferences sharedPreferences = activity.getSharedPreferences("UserData", Context.MODE_PRIVATE);
         return sharedPreferences.getString("apiToken", "");
     }

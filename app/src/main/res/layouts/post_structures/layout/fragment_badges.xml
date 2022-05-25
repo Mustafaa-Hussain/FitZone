@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.BadgesFragment">
+    tools:context=".fragments.home_activity_fragments.BadgesFragment">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tl_badges_page"

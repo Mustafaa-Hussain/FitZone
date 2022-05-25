@@ -1,103 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginActivity"
     android:background="@drawable/login_bk"
-    android:focusableInTouchMode="true">
+    android:focusableInTouchMode="true"
+    tools:context=".LoginActivity">
 
-<LinearLayout android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginBottom="8dp"
-    android:layout_marginEnd="24dp"
-    android:layout_marginStart="24dp"
-    android:layout_marginTop="8dp"
-    android:orientation="vertical"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <TextView
-        android:layout_gravity="start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/loginHeader"
-        android:text="@string/login"
-        android:layout_marginTop="@dimen/loginViewsMargin"/>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputEmail"
-        style="@style/parent"
-        android:layout_marginTop="@dimen/loginViewsMargin" >
-
-        <EditText
-            android:id="@+id/email"
-            style="@style/modifiedEditText"
-            android:hint="@string/login_email_hint"
-            android:inputType="textEmailAddress"
-            android:maxLines="1" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputPassword"
-        style="@style/parent"
-        android:layout_marginTop="@dimen/loginViewsMargin">
-
-        <EditText
-            android:id="@+id/password"
-            style="@style/modifiedEditText"
-            android:hint="@string/login_password_hint"
-            android:inputType="textPassword"
-            android:maxLines="1" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-
-    <LinearLayout
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/login_button"
-            style="@style/loginButton"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            style="@style/loginHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/loginViewsMargin"
             android:text="@string/login"
-            android:layout_gravity="right"
+            android:textAlignment="center" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputEmail"
+            style="@style/parent"
+            android:layout_marginTop="@dimen/loginViewsMargin">
+
+            <EditText
+                android:id="@+id/email"
+                style="@style/modifiedEditText"
+                android:hint="@string/login_email_hint"
+                android:inputType="textEmailAddress"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputPassword"
+            style="@style/parent"
+            android:layout_marginTop="@dimen/loginViewsMargin">
+
+            <EditText
+                android:id="@+id/password"
+                style="@style/modifiedEditText"
+                android:hint="@string/login_password_hint"
+                android:inputType="textPassword"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/login_button"
+                style="@style/loginButton"
+                android:layout_gravity="right"
+                android:layout_margin="10dp"
+                android:layout_marginTop="@dimen/loginViewsMargin"
+                android:text="@string/login"
+                android:textAllCaps="false" />
+
+            <Button
+                style="@style/loginButton"
+                android:layout_gravity="left"
+                android:layout_margin="10dp"
+                android:layout_marginTop="@dimen/loginViewsMargin"
+                android:onClick="goToTrainingPage"
+                android:padding="10dp"
+                android:text="@string/start_training"
+                android:textAllCaps="false"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <TextView
+            style="@style/parent"
             android:layout_marginTop="@dimen/loginViewsMargin"
-            android:layout_margin="10dp"
-            android:textAllCaps="false" />
-        <Button
-            style="@style/loginButton"
-            android:padding="10dp"
-            android:text="@string/start_training"
-            android:layout_gravity="left"
+            android:onClick="goToSignup"
+            android:padding="6dp"
+            android:text="@string/login_signup_hint"
+            android:textColor="@color/primaryTextColor"
+            android:textStyle="bold" />
+
+
+        <TextView
+            style="@style/parent"
             android:layout_marginTop="@dimen/loginViewsMargin"
-            android:onClick="goToTrainingPage"
-            android:layout_margin="10dp"
-            android:textAllCaps="false" />
+            android:onClick="changeServerIp"
+            android:padding="5dp"
+            android:text="@string/setIpaAndPort"
+            android:textColor="@color/primaryTextColor"
+            android:textStyle="normal" />
 
     </LinearLayout>
-    <TextView
-        style="@style/parent"
-        android:textStyle="bold"
-        android:textColor="@color/primaryTextColor"
-        android:text="@string/login_signup_hint"
-        android:layout_marginTop="@dimen/loginViewsMargin"
-        android:onClick="goToSignup"
-        android:padding="6dp"/>
-
-
-    <TextView
-        style="@style/parent"
-        android:textStyle="normal"
-        android:textColor="@color/primaryTextColor"
-        android:text="@string/setIpaAndPort"
-        android:layout_marginTop="@dimen/loginViewsMargin"
-        android:onClick="changeServerIp"
-        android:padding="5dp"/>
-
-</LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,4 +1,4 @@
-package com.example.fitzone.activites.fragments;
+package com.example.fitzone.activites.fragments.home_activity_fragments;
 
 import static com.example.fitzone.common_functions.StaticFunctions.getApiToken;
 import static com.example.fitzone.common_functions.StaticFunctions.getBaseUrl;
@@ -28,25 +28,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
-import com.example.fitzone.OnSwipeTouchListener;
 import com.example.fitzone.activites.Comments;
 import com.example.fitzone.activites.FriendsPage;
-import com.example.fitzone.activites.HomeActivity;
 import com.example.fitzone.activites.LoginActivity;
-import com.example.fitzone.activites.MainActivity;
 import com.example.fitzone.activites.R;
-import com.example.fitzone.activites.Reconnect;
+import com.example.fitzone.activites.fragments.CreateNewPost;
+import com.example.fitzone.activites.fragments.EditProfileImageFragment;
 import com.example.fitzone.handelers.HandlePost;
 import com.example.fitzone.handelers.HandleRequests;
-import com.example.fitzone.recycleViewAdapters.RecycleViewAdapterForPosts;
+import com.example.fitzone.recycleViewAdapters.ProfilePostsAdapter;
 import com.example.fitzone.retrofit_requists.ApiInterface;
 import com.example.fitzone.retrofit_requists.data_models.user_profile_data.UserProfileResponse;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -54,13 +48,12 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ProfileFragment extends Fragment implements RecycleViewAdapterForPosts.ItemClickListener {
+public class ProfileFragment extends Fragment implements ProfilePostsAdapter.ItemClickListener {
 
-    private int userId;
-    private RecycleViewAdapterForPosts adapter;
+    private ProfilePostsAdapter adapter;
     private RecyclerView recyclerView;
     private Button share, cancel, yes, no, showMyFriends, logout;
-    private TextView userName;
+    private TextView userName, userLevel;
 
     private ImageView profileImage;
 
@@ -87,6 +80,7 @@ public class ProfileFragment extends Fragment implements RecycleViewAdapterForPo
 
         //inflate elements
         userName = view.findViewById(R.id.userName);
+        userLevel = view.findViewById(R.id.user_level);
         profileImage = view.findViewById(R.id.userImage);
         swipeRefreshLayout = view.findViewById(R.id.profile_swipe_refresh);
         showMyFriends = view.findViewById(R.id.myFriends);
@@ -101,96 +95,88 @@ public class ProfileFragment extends Fragment implements RecycleViewAdapterForPo
 
         handleRequests = new HandleRequests(getActivity());
 
-        recyclerView.setOnTouchListener(new OnSwipeTouchListener(getActivity()) {
-
-            public void onSwipeTop() {
-                //TODO thomething when scroling up
-            }
-
-            public void onSwipeBottom() {
-                //TODO thomething when scroling down
-            }
-
-        });
-
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         swipeRefreshLayout.setOnRefreshListener(this::getUserProfile);
 
+
         addPost = view.findViewById(R.id.add_post_inProfile_fab);
         addPost.setOnClickListener(view12 -> {
 
-            //handle adding new post
-
-            // inflate the layout of the popup window
-            LayoutInflater inflater = (LayoutInflater)
-                    getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View popupView = inflater.inflate(R.layout.add_post, null);
-
-            // create the popup window
-            int width = LinearLayout.LayoutParams.MATCH_PARENT;
-            int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-            boolean focusable = true; // lets taps outside the popup also dismiss it
-            popupWindow = new PopupWindow(popupView, width, height, true);
-
-            // show the popup window
-            // which view you pass in doesn't matter, it is only used for the window token
-            popupWindow.showAtLocation(view12, Gravity.CENTER, 0, 0);
-
-            share = popupView.findViewById(R.id.sharePost);
-            share.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    TextView caption, content;
-                    caption = popupView.findViewById(R.id.caption);
-                    content = popupView.findViewById(R.id.content);
-
-                    if (!caption.getText().equals("") && !content.getText().equals("")) {
-
-                        int postType = 0;
-                        handleRequests = new HandleRequests(getActivity());
-                        handleRequests.addPost(caption.getText().toString(), content.getText().toString(), postType, apiToken,
-                                new HandleRequests.VolleyResponseListener() {
-                                    @Override
-                                    public void onResponse(boolean status, JSONObject jsonObject) {
-                                        if (status) {
-                                            Snackbar.make(view12, "post shared successfully", Snackbar.LENGTH_LONG)
-                                                    .setAction("Action", null).show();
-
-                                            getUserProfile();
-
-                                            popupWindow.dismiss();
-                                        } else {
-                                            Snackbar.make(view12, "something wrong with your internet connection", Snackbar.LENGTH_LONG)
-                                                    .setAction("Action", null).show();
-                                        }
-                                    }
-                                });
-                    } else {
-                        Snackbar.make(view12, "must fill all fields", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-                    }
-
-                }
-            });
-
-            cancel = popupView.findViewById(R.id.cancelPopUp);
-            cancel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Snackbar.make(view12, "cancel post", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-
-                    popupWindow.dismiss();
-                }
-            });
-
-            // dismiss the popup window when touched
-            popupView.setOnTouchListener((v, event) -> {
-                popupWindow.dismiss();
-                return true;
-            });
+            //adding new post
+            addPost();
+//
+//            //handle adding new post
+//
+//            // inflate the layout of the popup window
+//            LayoutInflater inflater = (LayoutInflater)
+//                    getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//            View popupView = inflater.inflate(R.layout.add_text_post, null);
+//
+//            // create the popup window
+//            int width = LinearLayout.LayoutParams.MATCH_PARENT;
+//            int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+//            boolean focusable = true; // lets taps outside the popup also dismiss it
+//            popupWindow = new PopupWindow(popupView, width, height, true);
+//
+//            // show the popup window
+//            // which view you pass in doesn't matter, it is only used for the window token
+//            popupWindow.showAtLocation(view12, Gravity.CENTER, 0, 0);
+//
+//            share = popupView.findViewById(R.id.sharePost);
+//            share.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//
+//                    TextView caption, content;
+//                    caption = popupView.findViewById(R.id.caption);
+//                    content = popupView.findViewById(R.id.content);
+//
+//                    if (!caption.getText().equals("") && !content.getText().equals("")) {
+//
+//                        int postType = 0;
+//                        handleRequests = new HandleRequests(getActivity());
+//                        handleRequests.addPost(caption.getText().toString(), content.getText().toString(), postType, apiToken,
+//                                new HandleRequests.VolleyResponseListener() {
+//                                    @Override
+//                                    public void onResponse(boolean status, JSONObject jsonObject) {
+//                                        if (status) {
+//                                            Snackbar.make(view12, "post shared successfully", Snackbar.LENGTH_LONG)
+//                                                    .setAction("Action", null).show();
+//
+//                                            getUserProfile();
+//
+//                                            popupWindow.dismiss();
+//                                        } else {
+//                                            Snackbar.make(view12, "something wrong with your internet connection", Snackbar.LENGTH_LONG)
+//                                                    .setAction("Action", null).show();
+//                                        }
+//                                    }
+//                                });
+//                    } else {
+//                        Snackbar.make(view12, "must fill all fields", Snackbar.LENGTH_LONG)
+//                                .setAction("Action", null).show();
+//                    }
+//
+//                }
+//            });
+//
+//            cancel = popupView.findViewById(R.id.cancelPopUp);
+//            cancel.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Snackbar.make(view12, "cancel post", Snackbar.LENGTH_LONG)
+//                            .setAction("Action", null).show();
+//
+//                    popupWindow.dismiss();
+//                }
+//            });
+//
+//            // dismiss the popup window when touched
+//            popupView.setOnTouchListener((v, event) -> {
+//                popupWindow.dismiss();
+//                return true;
+//            });
         });
 
         //handle deleting post
@@ -205,6 +191,14 @@ public class ProfileFragment extends Fragment implements RecycleViewAdapterForPo
 
         swipeRefreshLayout.setRefreshing(true);
         getUserProfile();
+
+    }
+
+    private void goToEditProfileImageFragment(View view, int userId, String userAvatar) {
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fl_home_activity, new EditProfileImageFragment(userAvatar))
+                .addToBackStack("ProfileFragment")
+                .commit();
     }
 
     //get and display user data and posts
@@ -215,13 +209,16 @@ public class ProfileFragment extends Fragment implements RecycleViewAdapterForPo
 
         Call<UserProfileResponse> call = apiInterface.getUserProfileData("Bearer " + getApiToken(getActivity()));
         call.enqueue(new Callback<UserProfileResponse>() {
+            @SuppressLint({"ResourceType", "SetTextI18n"})
             @Override
             public void onResponse(Call<UserProfileResponse> call, Response<UserProfileResponse> response) {
                 if (response.body() == null)
                     return;
 
-                userId = response.body().getId();
+                profileImage.setOnClickListener(view -> goToEditProfileImageFragment(view, response.body().getId(), response.body().getAvatar()));
+
                 userName.setText(response.body().getUsername());
+                userLevel.setText(getActivity().getString(R.string.level) + ' ' + response.body().getLevel());
 
                 //fill avatar image
                 Glide.with(getActivity())
@@ -231,7 +228,7 @@ public class ProfileFragment extends Fragment implements RecycleViewAdapterForPo
                         .placeholder(R.drawable.loading_spinner)
                         .into(profileImage);
 
-                adapter = new RecycleViewAdapterForPosts(getActivity(), response.body().getPosts());
+                adapter = new ProfilePostsAdapter(getActivity(), response.body().getPosts());
                 adapter.setClickListener(ProfileFragment.this);
                 recyclerView.setAdapter(adapter);
                 swipeRefreshLayout.setRefreshing(false);
@@ -250,25 +247,27 @@ public class ProfileFragment extends Fragment implements RecycleViewAdapterForPo
     public void onItemClick(View view, int position) {
 
         int postID = adapter.getItem(position).getId();
+        boolean liked = adapter.getItem(position).getLiked();
+
         if (view.getId() == R.id.like) {
             //handle like button
             HandlePost handlePost = new HandlePost(getActivity());
             //send request
-            handlePost.likeOrDislike(postID);
-            handlePost.setLikeButtonState(view, postID);
-            handlePost.updatePost();
+            handlePost.likeOrDislike(liked, postID);
+            handlePost.setLikeButtonState(view, !liked);
+            adapter.getItem(position).setLiked(!liked);
 
             int noOfLikesInt = adapter.getItem(position).getNumber_of_likes();
 
             RecyclerView.ViewHolder rv_view = recyclerView.findViewHolderForAdapterPosition(position);
             TextView noOfLikes = rv_view.itemView.findViewById(R.id.noOfLikes);
 
-            if (((Button) view.findViewById(R.id.like)).getHint().equals("true"))
-                adapter.getItem(position).setNumber_of_likes(--noOfLikesInt);
-            else
+            if (adapter.getItem(position).getLiked())
                 adapter.getItem(position).setNumber_of_likes(++noOfLikesInt);
+            else
+                adapter.getItem(position).setNumber_of_likes(--noOfLikesInt);
 
-            noOfLikes.setText(adapter.getItem(position).getNumber_of_likes());
+            noOfLikes.setText("" + adapter.getItem(position).getNumber_of_likes());
 
             //update no. of likes and no. of comments
 
@@ -291,7 +290,6 @@ public class ProfileFragment extends Fragment implements RecycleViewAdapterForPo
             // create the popup window
             int width = LinearLayout.LayoutParams.MATCH_PARENT;
             int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-            boolean focusable = true; // lets taps outside the popup also dismiss it
             askPopup = new PopupWindow(popupView, width, height, true);
 
 
@@ -369,4 +367,14 @@ public class ProfileFragment extends Fragment implements RecycleViewAdapterForPo
         });
 
     }
+
+
+    private void addPost() {
+        getActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fl_home_activity, new CreateNewPost())
+                .addToBackStack("HomeFragment")
+                .commit();
+    }
+
 }

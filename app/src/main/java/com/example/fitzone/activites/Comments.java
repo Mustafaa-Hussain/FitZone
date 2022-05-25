@@ -19,7 +19,7 @@ import android.widget.PopupWindow;
 
 import com.example.fitzone.handelers.HandleRequests;
 
-import com.example.fitzone.recycleViewAdapters.RecycleViewAdapterForComments;
+import com.example.fitzone.recycleViewAdapters.CommentsAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -29,7 +29,7 @@ import org.json.JSONObject;
 
 public class Comments extends AppCompatActivity {
 
-    RecycleViewAdapterForComments adapter;
+    CommentsAdapter adapter;
     RecyclerView recyclerView;
 
     FloatingActionButton addComment;
@@ -48,7 +48,7 @@ public class Comments extends AppCompatActivity {
         String apiToken = apiTokenFile.getString("apiToken", null);
 
         intent = getIntent();
-        int postID = Integer.parseInt(intent.getStringExtra("post_id"));
+        int postID = intent.getIntExtra("post_id", 0);
 
         addComment = findViewById(R.id.add_comment);
         addComment.setOnClickListener(new View.OnClickListener() {
@@ -150,7 +150,7 @@ public class Comments extends AppCompatActivity {
                         JSONArray myComments = jsonObject.getJSONArray("comments");
 
                         if(!myComments.toString().equals("[]")) {
-                            adapter = new RecycleViewAdapterForComments(Comments.this, myComments);
+                            adapter = new CommentsAdapter(Comments.this, myComments);
                         }
                         else {
                             Snackbar.make(findViewById(R.id.recycleView), "this post doesn't have comments", Snackbar.LENGTH_LONG)

@@ -66,6 +66,7 @@ public final class LivePreviewActivity extends AppCompatActivity
     private int trainingSets;
     private int trainingSetNumber;
     private int lastTime;
+    private int challengeId;
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -78,6 +79,9 @@ public final class LivePreviewActivity extends AppCompatActivity
         Intent dataIntent = getIntent();
         trainingName = dataIntent.getStringExtra("TName");
         trainingReps = dataIntent.getIntExtra("TReps", 10);
+
+        challengeId = dataIntent.getIntExtra("challengeId", 0);
+
         trainingSets = dataIntent.getIntExtra("TSets", 3);
         trainingSetNumber = dataIntent.getIntExtra("setNumber", 1);
         lastTime = dataIntent.getIntExtra("lastTime", 0);
@@ -181,7 +185,7 @@ public final class LivePreviewActivity extends AppCompatActivity
                                     rescaleZ,
                                     runClassification,
                                     true,
-                                    trainingName, trainingReps, trainingSets, trainingSetNumber, lastTime));
+                                    trainingName, trainingReps, trainingSets, trainingSetNumber, lastTime, challengeId));
                     break;
                 case SELFIE_SEGMENTATION:
                     cameraSource.setMachineLearningFrameProcessor(new SegmenterProcessor(this));
@@ -225,9 +229,12 @@ public final class LivePreviewActivity extends AppCompatActivity
         startCameraSource();
     }
 
+
+
     /**
      * Stops the camera.
      */
+
     @Override
     protected void onPause() {
         super.onPause();

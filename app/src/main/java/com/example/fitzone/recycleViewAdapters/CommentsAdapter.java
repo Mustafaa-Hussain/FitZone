@@ -5,7 +5,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,14 +14,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class RecycleViewAdapterForComments extends RecyclerView.Adapter<RecycleViewAdapterForComments.ViewHolder> {
+public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHolder> {
 
     private JSONArray mData;
     private LayoutInflater mInflater;
     Context context;
 
     // data is passed into the constructor
-    public RecycleViewAdapterForComments(Context context, JSONArray arrayOfPosts) {
+    public CommentsAdapter(Context context, JSONArray arrayOfPosts) {
         if (context == null)
             return;
 

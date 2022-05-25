@@ -1,6 +1,7 @@
 package com.example.fitzone.handelers;
 
 import static com.example.fitzone.common_functions.StaticFunctions.getBaseUrl;
+import static com.example.fitzone.common_functions.StaticFunctions.storeApiToken;
 
 import android.app.Activity;
 import android.widget.Toast;
@@ -557,6 +558,66 @@ public class HandleRequests {
 
     }
 
+
+    public void signupUser(String name, String email, String pwd, final VolleyResponseListener volleyResponseListener) {
+
+        final int[] statusCode = {0};
+        final boolean[] status = {false};
+
+        try {
+            String URL = API_SERVER_URL + "register";
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("username",name);
+            jsonBody.put("email",email);
+            jsonBody.put("password",pwd);
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, jsonBody,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                if(statusCode[0] == 201) {
+                                    String apiToken = response.getJSONObject("message").getString("api_token");
+                                    //store api token in sharedPreferences
+                                    storeApiToken( activity,apiToken);
+
+                                    Toast.makeText(activity, "Registration is Successfully", Toast.LENGTH_SHORT).show();
+                                    status[0] = true;
+                                    volleyResponseListener.onResponse(status[0], response);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    if(statusCode[0] == 200){
+                        Toast.makeText(activity, "Username or email is Exist", Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        Toast.makeText(activity, "Check Your Internet Connection!...", Toast.LENGTH_SHORT).show();
+                    }
+                    volleyResponseListener.onResponse(status[0], null);
+                }
+            }) {
+                @Override
+                public String getBodyContentType() {
+                    return "application/json; charset=utf-8";
+                }
+
+                @Override
+                protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
+                    statusCode[0] =response.statusCode;
+                    return super.parseNetworkResponse(response);
+                }
+            };
+
+            MySingleton.getInstance(activity).addToRequestQueue(jsonObjectRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
 
